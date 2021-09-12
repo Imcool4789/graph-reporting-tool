@@ -14,7 +14,7 @@ const cn ={
 }
 var db = pgp(cn)
 app.get('/', (req, res) => {
-  db.any("SELECT first_name,last_name from test;")
+  db.any("SELECT * from student_graduate_attributes;")
   .then (rows=>{
       console.log(rows);
       res.json(rows)
