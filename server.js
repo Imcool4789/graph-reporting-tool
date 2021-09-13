@@ -6,6 +6,7 @@ const app = express();
 const path=require("path")
 app.use(express.json());
 var pgp = require("pg-promise")(/* options */);
+//app.use(express.static(path.join(__dirname,"build"))); uncomment if testing on non production
 if(process.env.NODE_ENV==="production"){
   app.use(express.static(path.join(__dirname,"build")))
 }
@@ -16,10 +17,11 @@ const cn = {
   database: process.env.PG_DATABASE,
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
-  ssl: true,
+  ssl: { rejectUnauthorized: false }
 };
 const proConfig={
-  connectionString:process.env.DATABASE_URL
+  connectionString:process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 }
 var db = pgp(process.env.NODE_ENV==="production"?proConfig:cn);
 
