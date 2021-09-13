@@ -1,8 +1,7 @@
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const express = require('express')
 const app = express()
-const port = 3000
-
+const port = 5000
 var pgp = require('pg-promise')(/* options */)
 const cn ={
     host: 'ec2-44-195-201-3.compute-1.amazonaws.com',
@@ -13,8 +12,8 @@ const cn ={
     ssl:true
 }
 var db = pgp(cn)
-app.get('/', (req, res) => {
-  db.any("SELECT * from student_graduate_attributes;")
+app.get('/test', (req, res) => {
+  db.any("SELECT * from student_attributes;")
   .then (rows=>{
       console.log(rows);
       res.json(rows)
