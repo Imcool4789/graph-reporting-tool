@@ -1,10 +1,14 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
+import TableComponent from '../../components/Table'
+
+
+
 const Home = () => {
     return (
         <>
         <NavBar></NavBar>
-        This is the home section
+        <TableComponent></TableComponent>
         </>
     )
 }
