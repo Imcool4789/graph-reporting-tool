@@ -30,7 +30,19 @@ React native
 
 Node.js Server
 
-## CI/CD workflow
+![webstack image](/images/PERN_webstack.png)
+
+## Workflow
+
+Visual Studio code as IDE
+
+Github for version control
+
+Azure CI/CD pipeline
+
+Heroku for deployment and database hosts
+
+![webstack image](/images/Workflow.png)
 
 ## Development requirements
 
