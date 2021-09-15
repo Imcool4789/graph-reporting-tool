@@ -23,8 +23,11 @@ The application should have three sections:
 ## PERN as the Stack
 
 PostgreSQL
+
 Express.js
+
 React native
+
 Node.js Server
 
 ## CI/CD workflow
@@ -42,6 +45,7 @@ For local development:
 - node server.js
 
 React app will be hosted on localhost:3000
+
 Express will be hosted on localhost:5000
 
 
