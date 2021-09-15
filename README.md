@@ -30,7 +30,9 @@ React native
 
 Node.js Server
 
-![webstack image](/images/PERN_webstack.png)
+
+
+<img src="/images/PERN_webstack.png" width="540" height="720">
 
 ## Workflow
 
