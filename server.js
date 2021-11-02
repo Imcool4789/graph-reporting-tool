@@ -13,7 +13,7 @@ app.use(cors(corsOptions)) // Use this after the variable declaration
 const path = require("path");
 app.use(express.json());
 var pgp = require("pg-promise")(/* options */);
-//app.use(express.static(path.join(__dirname,"build"))); uncomment if testing on non production
+//app.use(express.static(path.join(__dirname,"build"))); //uncomment if testing on non production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "build")));
 }
