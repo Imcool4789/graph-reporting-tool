@@ -1,42 +1,47 @@
-import { useFilePicker } from "use-file-picker";
 import * as XLSX from "xlsx";
 import React from "react";
-const InstructorFileChooser = () => {
-  const [openFileSelector, { filesContent, loading, errors }] = useFilePicker({
-    accept: [".xlsx", ".xls", ".csv"],
-    multiple: false,
-  });
-  if (loading) {
-    return <div>Loading...</div>;
+export default class InstructorFileChooser extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { excelData: {} };
   }
-  if (errors.length) {
-    return <div>Error...</div>;
+  getState() {
+    let tmp=document.getElementById("contents");
+    tmp.innerHTML=this.state.excelData["Sheet1"];
   }
-  return (
-    <div>
-      <button onClick={() => openFileSelector()}>Select files </button>
-      <br />
-      {(() => {
-        if (filesContent.length > 0) {
-          switch (filesContent[0].name.split(".").pop()) {
-            case "xls":
-            case "xlsx":
-                console.log(filesContent[0].content);
-              let workbook = XLSX.read(filesContent, {
-                type: 'binary'
-              });
-              let sheet_name_list = workbook.SheetNames;
-              let xlData = XLSX.utils.sheet_to_json(
-                workbook.Sheets[sheet_name_list[0]]
-              );
-              console.log(xlData);
-              return xlData.stringify();
-            default:
-              break;
-          }
-        }
-      })()}
-    </div>
-  );
-};
-export default InstructorFileChooser;
+  excelToJson(reader) {
+    var fileData = reader.result;
+    var wb = XLSX.read(fileData, { type: "binary" });
+    var data = {};
+    wb.SheetNames.forEach(function (sheetName) {
+      var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheetName]);
+      var rowString = JSON.stringify(rowObj);
+      data[sheetName] = rowString;
+    });
+    this.setState({ excelData: data });
+    console.log(data["Sheet1"])
+  }
+
+  loadFileXLSX(event) {
+    var input = event.target;
+    var reader = new FileReader();
+    switch(input.files[0].name.split(".")[1]){
+      case "xlsx":
+        reader.onload = this.excelToJson.bind(this, reader);
+        reader.readAsBinaryString(input.files[0]);
+        break;
+    default:
+      break;
+    }
+  }
+  render() {
+    return (
+      <div>
+        <input type="file" onChange={this.loadFileXLSX.bind(this)} />
+        <br />
+        <button onClick={()=>this.getState()}>Show Json</button>
+        <div id="contents"></div>
+      </div>
+    );
+  }
+}
