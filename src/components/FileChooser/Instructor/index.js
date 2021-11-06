@@ -21,6 +21,7 @@ export default class InstructorFileChooser extends React.Component {
       data[i] = rowString;
     }
     this.setState({ excelData: data });
+    this.grabData();
   }
   csvToJson(reader) {
     var fileData = reader.result;
@@ -43,18 +44,19 @@ export default class InstructorFileChooser extends React.Component {
     this.formatArray(result);
     data[0] = JSON.stringify(result);
     this.setState({ excelData: data });
+    this.grabData();
   }
-  formatArray(arr){
-    for(let i=0;i<arr.length;i++){
+  formatArray(arr) {
+    for (let i = 0; i < arr.length; i++) {
       delete arr[i]["First Name"];
       delete arr[i]["Last Name"];
-      for(let key in arr[i]){
-        if(key.toLowerCase().includes("student id")){
-          arr[i]["student_id"]=arr[i][key];
+      for (let key in arr[i]) {
+        if (key.toLowerCase().includes("student id")) {
+          arr[i]["student_id"] = arr[i][key];
           delete arr[i][key];
-        }else if(key.toLowerCase().includes("ga")){
-          let newKey=key.toLowerCase().replace(/\s/g, '').replace(".","_");
-          arr[i][newKey]=arr[i][key];
+        } else if (key.toLowerCase().includes("ga")) {
+          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_");
+          arr[i][newKey] = arr[i][key];
           delete arr[i][key];
         }
       }
@@ -79,6 +81,28 @@ export default class InstructorFileChooser extends React.Component {
       }
     }
   }
+  grabData() {
+    fetch(
+      process.env.NODE_ENV === "production"
+        ? "https://graphing-report-tool.herokuapp.com/courseData"
+        : "http://localhost:5000/courseData",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: this.state.excelData[0],
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
   render() {
     return (
       <div>
