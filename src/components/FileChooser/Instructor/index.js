@@ -15,6 +15,8 @@ export default class InstructorFileChooser extends React.Component {
     var data = {};
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
+      console.log(rowObj);
+      this.formatArray(rowObj);
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
@@ -23,7 +25,7 @@ export default class InstructorFileChooser extends React.Component {
   csvToJson(reader) {
     var fileData = reader.result;
     var lines = fileData.split("\n");
-    if (lines[lines.length - 1] == "") {
+    if (lines[lines.length - 1] === "") {
       lines.pop();
     }
     var result = [];
@@ -38,10 +40,26 @@ export default class InstructorFileChooser extends React.Component {
       }
       result.push(obj);
     }
+    this.formatArray(result);
     data[0] = JSON.stringify(result);
     this.setState({ excelData: data });
   }
-
+  formatArray(arr){
+    for(let i=0;i<arr.length;i++){
+      delete arr[i]["First Name"];
+      delete arr[i]["Last Name"];
+      for(let key in arr[i]){
+        if(key.toLowerCase().includes("student id")){
+          arr[i]["student_id"]=arr[i][key];
+          delete arr[i][key];
+        }else if(key.toLowerCase().includes("ga")){
+          let newKey=key.toLowerCase().replace(/\s/g, '').replace(".","_");
+          arr[i][newKey]=arr[i][key];
+          delete arr[i][key];
+        }
+      }
+    }
+  }
   loadFileXLSX(event) {
     var input = event.target;
     var reader = new FileReader();
@@ -55,6 +73,7 @@ export default class InstructorFileChooser extends React.Component {
         case "csv":
           reader.onload = this.csvToJson.bind(this, reader);
           reader.readAsBinaryString(input.files[0]);
+          break;
         default:
           break;
       }
