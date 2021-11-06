@@ -1,0 +1,116 @@
+import * as XLSX from "xlsx";
+import React from "react";
+export default class InstructorFileChooser extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { excelData: {} };
+  }
+  getState() {
+    let tmp = document.getElementById("contents");
+    tmp.innerHTML = this.state.excelData[0];
+  }
+  excelToJson(reader) {
+    var fileData = reader.result;
+    var wb = XLSX.read(fileData, { type: "binary" });
+    var data = {};
+    for (let i = 0; i < wb.SheetNames.length; i++) {
+      var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
+      console.log(rowObj);
+      this.formatArray(rowObj);
+      var rowString = JSON.stringify(rowObj);
+      data[i] = rowString;
+    }
+    this.setState({ excelData: data });
+    this.grabData();
+  }
+  csvToJson(reader) {
+    var fileData = reader.result;
+    var lines = fileData.split("\n");
+    if (lines[lines.length - 1] === "") {
+      lines.pop();
+    }
+    var result = [];
+    var headers = lines[0].split(",");
+    var data = {};
+    for (var i = 1; i < lines.length; i++) {
+      var obj = {};
+      var currentline = lines[i].split(",");
+
+      for (var j = 0; j < headers.length; j++) {
+        obj[headers[j]] = currentline[j];
+      }
+      result.push(obj);
+    }
+    this.formatArray(result);
+    data[0] = JSON.stringify(result);
+    this.setState({ excelData: data });
+    this.grabData();
+  }
+  formatArray(arr) {
+    for (let i = 0; i < arr.length; i++) {
+      delete arr[i]["First Name"];
+      delete arr[i]["Last Name"];
+      for (let key in arr[i]) {
+        if (key.toLowerCase().includes("student id")) {
+          arr[i]["student_id"] = arr[i][key];
+          delete arr[i][key];
+        } else if (key.toLowerCase().includes("ga")) {
+          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_");
+          arr[i][newKey] = arr[i][key];
+          delete arr[i][key];
+        }
+      }
+    }
+  }
+  loadFileXLSX(event) {
+    var input = event.target;
+    var reader = new FileReader();
+    if (input.files[0] !== undefined) {
+      switch (input.files[0].name.split(".")[1]) {
+        case "xlsx":
+        case "xls":
+          reader.onload = this.excelToJson.bind(this, reader);
+          reader.readAsBinaryString(input.files[0]);
+          break;
+        case "csv":
+          reader.onload = this.csvToJson.bind(this, reader);
+          reader.readAsBinaryString(input.files[0]);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  grabData() {
+    fetch(
+      process.env.NODE_ENV === "production"
+        ? "https://graphing-report-tool.herokuapp.com/courseData"
+        : "http://localhost:5000/courseData",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: this.state.excelData[0],
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="file" onChange={this.loadFileXLSX.bind(this)} />
+        <br />
+        <button onClick={() => this.getState()}>Show Json</button>
+        <div id="contents"></div>
+      </div>
+    );
+  }
+}

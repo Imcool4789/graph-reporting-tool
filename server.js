@@ -1,19 +1,19 @@
 const PORT = process.env.PORT || 5000;
-const cors=require("cors");
-const corsOptions ={
-   origin:'*', 
-   credentials:true,            //access-control-allow-credentials:true
-   optionSuccessStatus:200,
-}
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
 require("dotenv").config();
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const express = require("express");
 const app = express();
-app.use(cors(corsOptions)) // Use this after the variable declaration
+app.use(cors(corsOptions)); // Use this after the variable declaration
 const path = require("path");
 app.use(express.json());
 var pgp = require("pg-promise")(/* options */);
-//app.use(express.static(path.join(__dirname,"build"))); uncomment if testing on non production
+//app.use(express.static(path.join(__dirname,"build"))); //uncomment if testing on non production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "build")));
 }
@@ -36,6 +36,69 @@ app.get("/test", (req, res) => {
   db.any("SELECT * from student_attributes;")
     .then((rows) => {
       console.log(rows);
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/courseData", (req, res) => {
+  db.any("SELECT * from student_program_mapping;")
+    .then((rows) => {
+      for (let i = 0; i < req.body.length; i++) {
+        for (let j = 0; j < rows.length; j++) {
+          if (req.body[i]["student_id"] === rows[j]["student_id"]) {
+            req.body[i]["program_name"] = rows[j]["program_name"];
+            delete req.body[i]["student_id"];
+            break;
+          }
+        }
+      }
+      console.log(req.body);
+      let dbName = "f21_sysc4101_a";
+      db.any("Delete from " + dbName)
+        .then(() => {
+          let query = "INSERT INTO " + dbName + " (";
+          let keys = Object.keys(req.body[0]);
+          for (let i = 0; i < keys.length - 1; i++) {
+            query += keys[i] + ",";
+          }
+          query += keys[keys.length - 1] + ") VALUES (";
+          for (let i = 0; i < req.body.length; i++) {
+            let tempQuery = query;
+            for (let j = 0; j < keys.length - 1; j++) {
+              if (keys[j] === "program_name") {
+                tempQuery += "'" + req.body[i][keys[j]] + "',";
+              } else {
+                tempQuery += req.body[i][keys[j]] + ",";
+              }
+            }
+            if (keys[keys.length-1] === "program_name") {
+              tempQuery += "'" + req.body[i][keys[keys.length - 1]] + "');";
+            } else {
+              tempQuery += req.body[i][keys[keys.length - 1]] + ");";
+            }
+            console.log(tempQuery);
+            db.any(tempQuery)
+              .then(() => {})
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      res.json(req.body);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+app.get("/testData", (req, res) => {
+  db.any("SELECT * from f21_sysc4101_a;")
+    .then((rows) => {
       res.json(rows);
     })
     .catch((error) => {

@@ -1,10 +1,12 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
+import InstructorFileChooser from '../../components/FileChooser/Instructor'
 const Instructors = () => {
     return (
         <div>
         <NavBar></NavBar>
-        This is the instructor section.
+        Welcome instructor.
+        <InstructorFileChooser></InstructorFileChooser>
         </div>
     )
 }

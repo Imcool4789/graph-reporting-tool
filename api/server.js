@@ -33,6 +33,17 @@ app.get("/test", (req, res) => {
     });
 });
 
+app.post("/courseData",(req, res) => {
+  db.any("SELECT * from student_attributes;")
+    .then((rows) => {
+      console.log(rows);
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  });
+
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
 });
