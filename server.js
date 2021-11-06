@@ -55,16 +55,37 @@ app.post("/courseData", (req, res) => {
           }
         }
       }
-      console.log(req.body)
-      //db.any("Delete from f21_sysc4101_a VALUES")
-      db.any("INSERT INTO f21_sysc4101_a (program_name, ga7_3, ga7_5, ga8_4, ga8_6, ga8_8) VALUES (" + req.body + ");")
+      console.log(req.body);
+      let dbName = "f21_sysc4101_a";
+      db.any("Delete from " + dbName)
         .then(() => {
-          /**db.any("INSERT INTO f21_sysc4101_a VALUES (" + req.body + ");")
-            .then(() => {})
-            .catch((error) => {
-              console.log(error);
-            });
-            **/
+          let query = "INSERT INTO " + dbName + " (";
+          let keys = Object.keys(req.body[0]);
+          for (let i = 0; i < keys.length - 1; i++) {
+            query += keys[i] + ",";
+          }
+          query += keys[keys.length - 1] + ") VALUES (";
+          for (let i = 0; i < req.body.length; i++) {
+            let tempQuery = query;
+            for (let j = 0; j < keys.length - 1; j++) {
+              if (keys[j] === "program_name") {
+                tempQuery += "'" + req.body[i][keys[j]] + "',";
+              } else {
+                tempQuery += req.body[i][keys[j]] + ",";
+              }
+            }
+            if (keys[keys.length-1] === "program_name") {
+              tempQuery += "'" + req.body[i][keys[keys.length - 1]] + "');";
+            } else {
+              tempQuery += req.body[i][keys[keys.length - 1]] + ");";
+            }
+            console.log(tempQuery);
+            db.any(tempQuery)
+              .then(() => {})
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
           console.log(error);
