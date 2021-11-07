@@ -101,27 +101,27 @@ export default class InstructorFileChooser extends React.Component {
   }
   populateChart(chartData) {
     const ctx = document.getElementById("myChart").getContext("2d");
-    const labels = Utils.months({ count: 7 });
+    const labels = ["ga1","ga2","ga3","ga4","ga5","ga6","ga7"];
     const data = {
       labels: labels,
       datasets: [
         {
-          label: "Dataset 1",
-          data: Utils.numbers(NUMBER_CFG),
-          backgroundColor: Utils.CHART_COLORS.red,
+          label: "areo",
+          data:[3,2,5,7,4,2,8],
+          backgroundColor: "#ff0000",
           stack: "Stack 0",
         },
         {
-          label: "Dataset 2",
-          data: Utils.numbers(NUMBER_CFG),
-          backgroundColor: Utils.CHART_COLORS.blue,
-          stack: "Stack 0",
-        },
-        {
-          label: "Dataset 3",
-          data: Utils.numbers(NUMBER_CFG),
-          backgroundColor: Utils.CHART_COLORS.green,
+          label: "areo",
+          data: [3,2,5,7,4,2,8],
+          backgroundColor: "#ff0000",
           stack: "Stack 1",
+        },
+        {
+          label: "areo",
+          data: [3,2,5,7,4,2,8],
+          backgroundColor: "#ff0000",
+          stack: "Stack 2",
         },
       ],
     };
@@ -149,6 +149,7 @@ export default class InstructorFileChooser extends React.Component {
         },
       },
     };
+    const myChart=new Chart(ctx,config);
   }
 
   render() {
