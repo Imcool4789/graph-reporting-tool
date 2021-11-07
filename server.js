@@ -24,18 +24,17 @@ const cn = {
   database: process.env.PG_DATABASE,
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }
 };
 const proConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }              
 };
 var db = pgp(process.env.NODE_ENV === "production" ? proConfig : cn);
 
 app.get("/test", (req, res) => {
   db.any("SELECT * from student_attributes;")
     .then((rows) => {
-      console.log(rows);
       res.json(rows);
     })
     .catch((error) => {
@@ -55,7 +54,6 @@ app.post("/courseData", (req, res) => {
           }
         }
       }
-      console.log(req.body);
       let dbName = "f21_sysc4101_a";
       db.any("Delete from " + dbName)
         .then(() => {
@@ -79,7 +77,6 @@ app.post("/courseData", (req, res) => {
             } else {
               tempQuery += req.body[i][keys[keys.length - 1]] + ");";
             }
-            console.log(tempQuery);
             db.any(tempQuery)
               .then(() => {})
               .catch((error) => {
@@ -90,7 +87,7 @@ app.post("/courseData", (req, res) => {
         .catch((error) => {
           console.log(error);
         });
-      res.json(req.body);
+      res.send(req.body);
     })
     .catch((error) => {
       console.log(error);

@@ -1,13 +1,13 @@
 import * as XLSX from "xlsx";
 import React from "react";
+import * as Chart from "chart.js";
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { excelData: {} };
+    this.state = { excelData: {}, disabled: true };
   }
   getState() {
-    let tmp = document.getElementById("contents");
-    tmp.innerHTML = this.state.excelData[0];
+    this.grabData();
   }
   excelToJson(reader) {
     var fileData = reader.result;
@@ -15,13 +15,11 @@ export default class InstructorFileChooser extends React.Component {
     var data = {};
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
-      console.log(rowObj);
       this.formatArray(rowObj);
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
-    this.setState({ excelData: data });
-    this.grabData();
+    this.setState({ excelData: data, disabled: false });
   }
   csvToJson(reader) {
     var fileData = reader.result;
@@ -43,8 +41,7 @@ export default class InstructorFileChooser extends React.Component {
     }
     this.formatArray(result);
     data[0] = JSON.stringify(result);
-    this.setState({ excelData: data });
-    this.grabData();
+    this.setState({ excelData: data, disabled: false });
   }
   formatArray(arr) {
     for (let i = 0; i < arr.length; i++) {
@@ -96,11 +93,62 @@ export default class InstructorFileChooser extends React.Component {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
+        this.populateChart(data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+  }
+  populateChart(chartData) {
+    const ctx = document.getElementById("myChart").getContext("2d");
+    const labels = Utils.months({ count: 7 });
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          label: "Dataset 1",
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.red,
+          stack: "Stack 0",
+        },
+        {
+          label: "Dataset 2",
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.blue,
+          stack: "Stack 0",
+        },
+        {
+          label: "Dataset 3",
+          data: Utils.numbers(NUMBER_CFG),
+          backgroundColor: Utils.CHART_COLORS.green,
+          stack: "Stack 1",
+        },
+      ],
+    };
+    const config = {
+      type: "bar",
+      data: data,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "Chart.js Bar Chart - Stacked",
+          },
+        },
+        responsive: true,
+        interaction: {
+          intersect: false,
+        },
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      },
+    };
   }
 
   render() {
@@ -108,8 +156,10 @@ export default class InstructorFileChooser extends React.Component {
       <div>
         <input type="file" onChange={this.loadFileXLSX.bind(this)} />
         <br />
-        <button onClick={() => this.getState()}>Show Json</button>
-        <div id="contents"></div>
+        <button disabled={this.state.disabled} onClick={() => this.getState()}>
+          Upload Graduate Attributes
+        </button>
+        <canvas id="myChart" width="400" height="400"></canvas>
       </div>
     );
   }
