@@ -5,7 +5,8 @@ import e from "cors";
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { excelData: {}, disabled: true,binData:{} };
+    this.state = { excelData: {}, disabled: true, binData: {} };
+    this.chart={};
   }
   getState() {
     this.grabData();
@@ -104,7 +105,7 @@ export default class InstructorFileChooser extends React.Component {
   }
   populateChart(chartData) {
     let binData2 = this.findBins(chartData);
-    console.log(binData2)
+    console.log(binData2);
     this.setState({ binData: binData2 });
     let buttonText = [];
     for (let prop in chartData[0]) {
@@ -117,8 +118,9 @@ export default class InstructorFileChooser extends React.Component {
       let button = document.createElement("button");
       let text = document.createTextNode(buttonText[i]);
       button.appendChild(text);
-      button.addEventListener("click", e=>{
-        this.updateChart(e)});
+      button.addEventListener("click", (e) => {
+        this.updateChart(e);
+      });
       temp.appendChild(button);
     }
   }
@@ -131,6 +133,9 @@ export default class InstructorFileChooser extends React.Component {
     return color;
   }
   updateChart(event) {
+    if(this.chart instanceof Chart){
+      this.chart.destroy();
+    }
     const ctx = document.getElementById("myChart").getContext("2d");
     let dataTable = [];
     for (let i = 0; i < this.state.binData.length; i++) {
@@ -152,11 +157,13 @@ export default class InstructorFileChooser extends React.Component {
       data: data,
       options: {
         maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: "GA breakdown",
-          },
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: event.path[0].innerText,
+          position: 'bottom'
         },
         responsive: true,
         interaction: {
@@ -172,7 +179,7 @@ export default class InstructorFileChooser extends React.Component {
         },
       },
     };
-    const myChart = new Chart(ctx, config);
+    this.chart= new Chart(ctx, config);
   }
   findBins(data) {
     var Bin = function (ga, data) {
