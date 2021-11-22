@@ -1,13 +1,15 @@
 import * as XLSX from "xlsx";
 import React from "react";
+import * as Chart from "chart.js";
+import e from "cors";
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { excelData: {} };
+    this.state = { excelData: {}, disabled: true, binData: {} };
+    this.chart={};
   }
   getState() {
-    let tmp = document.getElementById("contents");
-    tmp.innerHTML = this.state.excelData[0];
+    this.grabData();
   }
   excelToJson(reader) {
     var fileData = reader.result;
@@ -15,13 +17,11 @@ export default class InstructorFileChooser extends React.Component {
     var data = {};
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
-      console.log(rowObj);
       this.formatArray(rowObj);
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
-    this.setState({ excelData: data });
-    this.grabData();
+    this.setState({ excelData: data, disabled: false });
   }
   csvToJson(reader) {
     var fileData = reader.result;
@@ -43,8 +43,8 @@ export default class InstructorFileChooser extends React.Component {
     }
     this.formatArray(result);
     data[0] = JSON.stringify(result);
-    this.setState({ excelData: data });
-    this.grabData();
+    console.log(data[0]);
+    this.setState({ excelData: data, disabled: false });
   }
   formatArray(arr) {
     for (let i = 0; i < arr.length; i++) {
@@ -94,22 +94,186 @@ export default class InstructorFileChooser extends React.Component {
         body: this.state.excelData[0],
       }
     )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
+      .then((response) =>
+        response.json().then((data) => {
+          this.populateChart(data);
+        })
+      )
       .catch((error) => {
         console.error("Error:", error);
       });
   }
-
+  populateChart(chartData) {
+    let binData2 = this.findBins(chartData);
+    console.log(binData2);
+    this.setState({ binData: binData2 });
+    let buttonText = [];
+    for (let prop in chartData[0]) {
+      if (prop !== "program_name") {
+        buttonText.push(prop);
+      }
+    }
+    let temp = document.getElementById("buttonplaceholder");
+    for (let i = 0; i < buttonText.length; i++) {
+      let button = document.createElement("button");
+      let text = document.createTextNode(buttonText[i]);
+      button.appendChild(text);
+      button.addEventListener("click", (e) => {
+        this.updateChart(e);
+      });
+      temp.appendChild(button);
+    }
+  }
+  getRandomColor() {
+    var letters = "0123456789ABCDEF";
+    var color = "#";
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+  updateChart(event) {
+    if(this.chart instanceof Chart){
+      this.chart.destroy();
+    }
+    const ctx = document.getElementById("myChart").getContext("2d");
+    let dataTable = [];
+    for (let i = 0; i < this.state.binData.length; i++) {
+      if (this.state.binData[i].getBin.getGa === event.path[0].innerText) {
+        dataTable.push({
+          label: this.state.binData[i].getStream,
+          data: this.state.binData[i].getBin.getData,
+          backgroundColor: this.getRandomColor(),
+        });
+      }
+    }
+    const labels = [1, 2, 3, 4];
+    const data = {
+      labels: labels,
+      datasets: dataTable,
+    };
+    const config = {
+      type: "bar",
+      data: data,
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: event.path[0].innerText,
+          position: 'bottom'
+        },
+        responsive: true,
+        interaction: {
+          intersect: false,
+        },
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      },
+    };
+    this.chart= new Chart(ctx, config);
+  }
+  findBins(data) {
+    var Bin = function (ga, data) {
+      this.ga = ga;
+      this.data = data;
+      Object.defineProperty(this, "getGa", {
+        get: function () {
+          return this.ga;
+        },
+      });
+      Object.defineProperty(this, "setGa", {
+        set: function (ga) {
+          this.ga = ga;
+        },
+      });
+      Object.defineProperty(this, "getData", {
+        get: function () {
+          return this.data;
+        },
+      });
+      Object.defineProperty(this, "setData", {
+        set: function (data) {
+          this.data = data;
+        },
+      });
+    };
+    var Bins = function (stream, bin) {
+      this.stream = stream;
+      this.bin = bin;
+      Object.defineProperty(this, "getStream", {
+        get: function () {
+          return this.stream;
+        },
+      });
+      Object.defineProperty(this, "setStream", {
+        set: function (stream) {
+          this.stream = stream;
+        },
+      });
+      Object.defineProperty(this, "getBin", {
+        get: function () {
+          return this.bin;
+        },
+      });
+      Object.defineProperty(this, "setBin", {
+        set: function (bin) {
+          this.bin = bin;
+        },
+      });
+    };
+    let dataBins = [];
+    for (var i = 0; i < data.length; i++) {
+      var program = data[i]["program_name"];
+      for (let prop in data[i]) {
+        if (prop !== "program_name") {
+          if (dataBins.length > 0) {
+            var added = false;
+            for (let bin in dataBins) {
+              if (
+                dataBins[bin].getStream === program &&
+                dataBins[bin].getBin.getGa === prop
+              ) {
+                let temp = dataBins[bin].getBin.getData;
+                temp[data[i][prop] - 1]++;
+                dataBins[bin].getBin.setData = temp;
+                added = true;
+                break;
+              }
+            }
+            if (!added) {
+              let temp = [0, 0, 0, 0];
+              temp[data[i][prop] - 1]++;
+              dataBins.push(new Bins(program, new Bin(prop, temp)));
+            }
+          } else {
+            let temp = [0, 0, 0, 0];
+            temp[data[i][prop] - 1]++;
+            dataBins.push(new Bins(program, new Bin(prop, temp)));
+          }
+        }
+      }
+    }
+    return dataBins;
+  }
   render() {
     return (
       <div>
         <input type="file" onChange={this.loadFileXLSX.bind(this)} />
         <br />
-        <button onClick={() => this.getState()}>Show Json</button>
-        <div id="contents"></div>
+        <button disabled={this.state.disabled} onClick={() => this.getState()}>
+          Upload Graduate Attributes
+        </button>
+        <div id="buttonplaceholder"></div>
+        <canvas id="myChart" width="400" height="400"></canvas>
       </div>
     );
   }
