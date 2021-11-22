@@ -42,6 +42,45 @@ app.get("/test", (req, res) => {
     });
 });
 
+app.post("/adminSubmission", (req, res) => {
+   let temp = [];
+   var s;
+  for (let i = 0; i < req.body.length; i++){
+    console.log(req.body[i]);
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("year")) {
+        temp.push(req.body[i][key]);
+        console.log(req.body[i][key]);
+      } else if(key.toLowerCase().includes("ga")) {
+        temp.push(req.body[i][key]);
+      } else if (key.toLowerCase().includes("course")){
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var year = temp[0];
+  var course = temp[1];
+  temp.shift();
+  temp.shift();
+  temp.unshift(year + "_" + course);
+  console.log(temp);
+  var tableName = "_" + temp[0];
+  var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY);";
+  console.log(table);
+  db.any(table)
+    .then(() => {
+      for (let i = 1; i < temp.length; i++){
+        var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
+        console.log(add);
+        db.any(add);
+      }
+    });
+    
+
+  
+});
+
+
 app.post("/courseData", (req, res) => {
   db.any("SELECT * from student_program_mapping;")
     .then((rows) => {
