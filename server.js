@@ -24,24 +24,62 @@ const cn = {
   database: process.env.PG_DATABASE,
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }
 };
 const proConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }              
 };
 var db = pgp(process.env.NODE_ENV === "production" ? proConfig : cn);
 
 app.get("/test", (req, res) => {
   db.any("SELECT * from student_attributes;")
     .then((rows) => {
-      console.log(rows);
       res.json(rows);
     })
     .catch((error) => {
       console.log(error);
     });
 });
+
+app.post("/adminSubmission", (req, res) => {
+   let temp = [];
+   var s;
+  for (let i = 0; i < req.body.length; i++){
+    console.log(req.body[i]);
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("year")) {
+        temp.push(req.body[i][key]);
+        console.log(req.body[i][key]);
+      } else if(key.toLowerCase().includes("ga")) {
+        temp.push(req.body[i][key]);
+      } else if (key.toLowerCase().includes("course")){
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var year = temp[0];
+  var course = temp[1];
+  temp.shift();
+  temp.shift();
+  temp.unshift(year + "_" + course);
+  console.log(temp);
+  var tableName = "_" + temp[0];
+  var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY);";
+  console.log(table);
+  db.any(table)
+    .then(() => {
+      for (let i = 1; i < temp.length; i++){
+        var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
+        console.log(add);
+        db.any(add);
+      }
+    });
+    
+
+  
+});
+
 
 app.post("/courseData", (req, res) => {
   db.any("SELECT * from student_program_mapping;")
@@ -55,7 +93,6 @@ app.post("/courseData", (req, res) => {
           }
         }
       }
-      console.log(req.body);
       let dbName = "f21_sysc4101_a";
       db.any("Delete from " + dbName)
         .then(() => {
@@ -79,7 +116,6 @@ app.post("/courseData", (req, res) => {
             } else {
               tempQuery += req.body[i][keys[keys.length - 1]] + ");";
             }
-            console.log(tempQuery);
             db.any(tempQuery)
               .then(() => {})
               .catch((error) => {
@@ -90,7 +126,7 @@ app.post("/courseData", (req, res) => {
         .catch((error) => {
           console.log(error);
         });
-      res.json(req.body);
+      res.send(req.body);
     })
     .catch((error) => {
       console.log(error);

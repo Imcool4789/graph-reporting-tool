@@ -1,11 +1,13 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
+import AdminFileChooser from '../../components/FileChooser/Admin'
 
 const Administrators = () => {
     return (
         <div>
             <NavBar></NavBar>
-            This is the admin section
+            Welcome Administrator
+            <AdminFileChooser></AdminFileChooser>
         </div>
     )
 }
