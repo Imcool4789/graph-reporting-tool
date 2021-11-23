@@ -1,7 +1,10 @@
 import * as XLSX from "xlsx";
 import React from "react";
 import * as Chart from "chart.js";
-import e from "cors";
+import Bin from '../../../util/DataObjects/Bin';
+import Bins from '../../../util/DataObjects/Bins';
+import HelperFunctions from "../../../util/HelperFunctions";
+
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
@@ -105,7 +108,6 @@ export default class InstructorFileChooser extends React.Component {
   }
   populateChart(chartData) {
     let binData2 = this.findBins(chartData);
-    console.log(binData2);
     this.setState({ binData: binData2 });
     let buttonText = [];
     for (let prop in chartData[0]) {
@@ -124,14 +126,6 @@ export default class InstructorFileChooser extends React.Component {
       temp.appendChild(button);
     }
   }
-  getRandomColor() {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
   updateChart(event) {
     if(this.chart instanceof Chart){
       this.chart.destroy();
@@ -139,11 +133,11 @@ export default class InstructorFileChooser extends React.Component {
     const ctx = document.getElementById("myChart").getContext("2d");
     let dataTable = [];
     for (let i = 0; i < this.state.binData.length; i++) {
-      if (this.state.binData[i].getBin.getGa === event.path[0].innerText) {
+      if (this.state.binData[i].getBin().getGa() === event.path[0].innerText) {
         dataTable.push({
-          label: this.state.binData[i].getStream,
-          data: this.state.binData[i].getBin.getData,
-          backgroundColor: this.getRandomColor(),
+          label: this.state.binData[i].getStream(),
+          data: this.state.binData[i].getBin().getData(),
+          backgroundColor: HelperFunctions.getRandomColor(),
         });
       }
     }
@@ -182,54 +176,6 @@ export default class InstructorFileChooser extends React.Component {
     this.chart= new Chart(ctx, config);
   }
   findBins(data) {
-    var Bin = function (ga, data) {
-      this.ga = ga;
-      this.data = data;
-      Object.defineProperty(this, "getGa", {
-        get: function () {
-          return this.ga;
-        },
-      });
-      Object.defineProperty(this, "setGa", {
-        set: function (ga) {
-          this.ga = ga;
-        },
-      });
-      Object.defineProperty(this, "getData", {
-        get: function () {
-          return this.data;
-        },
-      });
-      Object.defineProperty(this, "setData", {
-        set: function (data) {
-          this.data = data;
-        },
-      });
-    };
-    var Bins = function (stream, bin) {
-      this.stream = stream;
-      this.bin = bin;
-      Object.defineProperty(this, "getStream", {
-        get: function () {
-          return this.stream;
-        },
-      });
-      Object.defineProperty(this, "setStream", {
-        set: function (stream) {
-          this.stream = stream;
-        },
-      });
-      Object.defineProperty(this, "getBin", {
-        get: function () {
-          return this.bin;
-        },
-      });
-      Object.defineProperty(this, "setBin", {
-        set: function (bin) {
-          this.bin = bin;
-        },
-      });
-    };
     let dataBins = [];
     for (var i = 0; i < data.length; i++) {
       var program = data[i]["program_name"];
@@ -239,12 +185,12 @@ export default class InstructorFileChooser extends React.Component {
             var added = false;
             for (let bin in dataBins) {
               if (
-                dataBins[bin].getStream === program &&
-                dataBins[bin].getBin.getGa === prop
+                dataBins[bin].getStream() === program &&
+                dataBins[bin].getBin().getGa() === prop
               ) {
-                let temp = dataBins[bin].getBin.getData;
+                let temp = dataBins[bin].getBin().getData();
                 temp[data[i][prop] - 1]++;
-                dataBins[bin].getBin.setData = temp;
+                dataBins[bin].getBin().setData(temp);
                 added = true;
                 break;
               }
