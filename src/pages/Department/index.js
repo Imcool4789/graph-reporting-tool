@@ -1,12 +1,12 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
-const Faculties = () => {
+const Department = () => {
     return (
         <div>
        <NavBar></NavBar>
-       This is the faculties sections
+       This is the Department sections
        </div>
     )
 }
 
-export default Faculties
+export default Department

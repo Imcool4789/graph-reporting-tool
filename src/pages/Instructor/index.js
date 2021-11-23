@@ -1,7 +1,7 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
 import InstructorFileChooser from '../../components/FileChooser/Instructor'
-const Instructors = () => {
+const Instructor = () => {
     return (
         <div>
         <NavBar></NavBar>
@@ -11,4 +11,4 @@ const Instructors = () => {
     )
 }
 
-export default Instructors
+export default Instructor
