@@ -1,18 +1,18 @@
 import * as XLSX from "xlsx";
 import React from "react";
 import * as Chart from "chart.js";
-import Bin from '../../../util/DataObjects/Bin';
-import Bins from '../../../util/DataObjects/Bins';
+import Bin from "../../../util/DataObjects/Bin";
+import Bins from "../../../util/DataObjects/Bins";
 import HelperFunctions from "../../../util/HelperFunctions";
+import html2canvas from "html2canvas";
+import pdfConverter from "jspdf";
 
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
     this.state = { excelData: {}, disabled: true, binData: {} };
-    this.chart={};
-  }
-  getState() {
-    this.grabData();
+    this.checked = false;
+    this.chart = {};
   }
   excelToJson(reader) {
     var fileData = reader.result;
@@ -24,7 +24,8 @@ export default class InstructorFileChooser extends React.Component {
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
-    this.setState({ excelData: data, disabled: false });
+    this.setState({ excelData: data });
+    this.buttonLogic();
   }
   csvToJson(reader) {
     var fileData = reader.result;
@@ -46,9 +47,22 @@ export default class InstructorFileChooser extends React.Component {
     }
     this.formatArray(result);
     data[0] = JSON.stringify(result);
-    console.log(data[0]);
-    this.setState({ excelData: data, disabled: false });
+    this.setState({ excelData: data });
+    this.buttonLogic();
   }
+  buttonLogic() {
+    if (this.state.excelData[0]!==undefined) {
+      let d = document.getElementById("error");
+      if (this.checked) {
+        this.setState({ disabled: false });
+        d.innerHTML = "";
+      } else {
+        d.innerHTML = "Please agree to the terms and conditions.";
+        this.setState({ disabled: true });
+      }
+    }
+  }
+
   formatArray(arr) {
     for (let i = 0; i < arr.length; i++) {
       delete arr[i]["First Name"];
@@ -127,7 +141,7 @@ export default class InstructorFileChooser extends React.Component {
     }
   }
   updateChart(event) {
-    if(this.chart instanceof Chart){
+    if (this.chart instanceof Chart) {
       this.chart.destroy();
     }
     const ctx = document.getElementById("myChart").getContext("2d");
@@ -152,12 +166,12 @@ export default class InstructorFileChooser extends React.Component {
       options: {
         maintainAspectRatio: false,
         legend: {
-          position: 'top',
+          position: "top",
         },
         title: {
           display: true,
           text: event.path[0].innerText,
-          position: 'bottom'
+          position: "bottom",
         },
         responsive: true,
         interaction: {
@@ -173,7 +187,7 @@ export default class InstructorFileChooser extends React.Component {
         },
       },
     };
-    this.chart= new Chart(ctx, config);
+    this.chart = new Chart(ctx, config);
   }
   findBins(data) {
     let dataBins = [];
@@ -210,16 +224,54 @@ export default class InstructorFileChooser extends React.Component {
     }
     return dataBins;
   }
+  convertToPdf(){
+    let chart=window.document.getElementById("myChart");
+    html2canvas(chart).then(canvas=>{
+      const img = canvas.toDataURL("image/png");
+      const pdf = new pdfConverter("l", "pt");
+      pdf.addImage(
+        img,
+        "png",
+        chart.offsetLeft,
+        chart.offsetTop,
+        chart.clientWidth,
+        chart.clientHeight
+      );
+      pdf.save("chart.pdf");
+    });
+  }
+  setCheck() {
+    this.checked = !this.checked;
+    this.buttonLogic();
+  }
+  getState() {
+    let r=window.confirm('Are you sure you wish to upload this spreadsheet?')
+    if (r){
+    this.grabData();
+    }
+  }
   render() {
     return (
       <div>
         <input type="file" onChange={this.loadFileXLSX.bind(this)} />
         <br />
+        <div>
+          <input type="checkbox" id="agree" onChange={this.setCheck.bind(this)} />
+          <label htmlFor="agree">
+            {" "}
+            I acknowledge that any previous existing data will be{" "}
+            <b>removed and replaced</b> with the new uploaded data.
+          </label>
+        </div>
         <button disabled={this.state.disabled} onClick={() => this.getState()}>
           Upload Graduate Attributes
         </button>
+        <div id="error"></div>
         <div id="buttonplaceholder"></div>
         <canvas id="myChart" width="400" height="400"></canvas>
+        <div>
+          <button onClick={(e) => this.convertToPdf(e)}>Export 2 PDF</button>
+        </div>
       </div>
     );
   }
