@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 import React from "react";
-export default class AdminFileChooser extends React.Component {
+export default class DepartmentFileChooser extends React.Component {
   constructor(props) {
     super(props);
     this.s = [];
@@ -12,10 +12,6 @@ export default class AdminFileChooser extends React.Component {
     tmp.innerHTML = this.state.excelData[0];
   }
 
-  getState1(){
-    let tmp = document.getElementById("contents");
-    tmp.innerHTML = this.s;
-  }
 
   excelToJson(reader) {
     var fileData = reader.result;
@@ -33,53 +29,6 @@ export default class AdminFileChooser extends React.Component {
     this.grabData();
   }
 
-  excelToJson1(reader) {
-    var fileData = reader.result;
-    var wb = XLSX.read(fileData, { type: "binary" });
-    var data = {};
-    for (let i = 0; i < wb.SheetNames.length; i++) {
-      var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
-      console.log(rowObj);
-      this.formatArray(rowObj);
-      var rowString = JSON.stringify(rowObj);
-      data[i] = rowString;
-    }
-    this.setState({ excelData: data });
-    console.log(this.state.excelData[0]);
-    this.grabData1();
-  }
-
-  showGA(){
-    var x = document.getElementById("test").value;
-    x = x.replace(".","_");
-    x = "_" + x;
-    console.log(x.length);
-    document.getElementById("demo").innerHTML = x;
-    let obj = {};
-    obj["GA"] = x;
-
-    let c = '[' + JSON.stringify(obj) + ']';
-    console.log(c);
-    fetch(
-      process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminGA"
-      : "http://localhost:5000/adminGA",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: c,
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
 
   csvToJson(reader) {
     var fileData = reader.result;
@@ -152,56 +101,12 @@ export default class AdminFileChooser extends React.Component {
     }
   }
 
-  loadFileXLSX1(event) {
-    var input = event.target;
-    var reader = new FileReader();
-    if (input.files[0] !== undefined) {
-      switch (input.files[0].name.split(".")[1]) {
-        case "xlsx":
-        case "xls":
-          reader.onload = this.excelToJson1.bind(this, reader);
-          reader.readAsBinaryString(input.files[0]);
-          break;
-        case "csv":
-          reader.onload = this.csvToJson.bind(this, reader);
-          reader.readAsBinaryString(input.files[0]);
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
-
   grabData() {
     console.log(this.state.excelData[0]);
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminSubmission"
-      : "http://localhost:5000/adminSubmission",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: this.state.excelData[0],
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
-
-  grabData1() {
-    console.log(this.state.excelData[0]);
-    fetch(
-      process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminDepartmentSubmission"
-      : "http://localhost:5000/adminDepartmentSubmission",
+      ? "https://graphing-report-tool.herokuapp.com/departmentSubmission"
+      : "http://localhost:5000/departmentSubmission",
       {
         method: "POST",
         headers: {
@@ -222,19 +127,8 @@ export default class AdminFileChooser extends React.Component {
   render() {
     return (
       <div>
-        <label for="avatar">Course Submission: </label>
+        <label for="avatar">Instructor Submission: </label>
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
-        <br />
-        <br />
-        <label for="avatar">Department Submission: </label>
-        <input type="file" id="2" onChange={this.loadFileXLSX1.bind(this)} />
-        <br />
-        <br />
-        <label for="avatar">Search GA: </label>
-        <br />
-        <input type="text" id="test"/>
-        <br/>
-        <button onClick={this.showGA} id="testButton" >Search</button>
         <br />
         <p id="demo"></p>
         <br />
