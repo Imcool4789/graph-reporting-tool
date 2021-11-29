@@ -11,9 +11,9 @@ const express = require("express");
 const app = express();
 app.use(cors(corsOptions)); // Use this after the variable declaration
 const path = require("path");
+const { addAbortSignal } = require("stream");
 app.use(express.json());
 var pgp = require("pg-promise")(/* options */);
-//app.use(express.static(path.join(__dirname,"build"))); //uncomment if testing on non production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "build")));
 }
@@ -40,6 +40,90 @@ app.get("/test", (req, res) => {
     .catch((error) => {
       console.log(error);
     });
+});
+
+app.post("/adminGA", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++){
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("ga")) {
+        temp.push(req.body[i][key]);
+        console.log(temp[0]);
+      }
+    }
+  }
+  var x = temp[0];
+  console.log(x);
+  var search = "select table_name from information_schema.columns where column_name = " + "'" + x + "';";
+  console.log(search);
+  var result = db.query(search);
+  console.log(result);
+});
+
+app.post("/departmentSubmission", (req, res) => {
+  var x = "CREATE TABLE " + "instructors " + "(email VARCHAR PRIMARY KEY, course VARCHAR, section VARCHAR);";
+  console.log(x);
+  let temp1 = [];
+  let temp2 = [];
+  let temp3 = [];
+  for (let i = 0; i < req.body.length; i++){
+    console.log(req.body[i]);
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("email")){
+          temp1.push(req.body[i][key]);
+          console.log(temp1[i]);
+      }
+      if (key.toLowerCase().includes("course")){
+        temp2.push(req.body[i][key]);
+        console.log(temp2[i]);
+      }
+      if (key.toLowerCase().includes("section")){
+        temp3.push(req.body[i][key]);
+        console.log(temp3[i]);
+      }
+    }
+  }
+  console.log(temp1);
+  console.log(temp2);
+  console.log(temp3);
+  db.any(x)
+  .then(() => {
+    for (let i = 0; i < temp1.length; i++){
+      db.any("INSERT INTO instructors(email, course, section) VALUES (" +"'"+ temp1[i] +"'"+ ","+ "'" + temp2[i] + "'"+ ","+ "'" + temp3[i] + "'" +");");
+    }
+  });
+});
+
+app.post("/adminDepartmentSubmission", (req, res) => {
+    var x = "CREATE TABLE " + "departments " + "(email VARCHAR PRIMARY KEY, dep_name VARCHAR);";
+    console.log(x);
+    let temp1 = [];
+    let temp2 = [];
+    
+    for (let i = 0; i < req.body.length; i++){
+      console.log(req.body[i]);
+      for (let key in req.body[i]) {
+        if (key.toLowerCase().includes("email")){
+            temp1.push(req.body[i][key]);
+            console.log(temp1[i]);
+
+        }
+        if (key.toLowerCase().includes("dep_name")){
+          temp2.push(req.body[i][key]);
+          console.log(temp2[i]);
+        }
+      }
+    }
+    console.log(temp1);
+    console.log(temp2);
+    db.any(x)
+    .then(() => {
+      for (let i = 0; i < temp1.length; i++){
+        db.any("INSERT INTO departments(email, dep_name) VALUES (" +"'"+ temp1[i] +"'"+ ","+ "'" + temp2[i] + "'"+");");
+      }
+    });
+    
+    
 });
 
 app.post("/adminSubmission", (req, res) => {
@@ -75,9 +159,6 @@ app.post("/adminSubmission", (req, res) => {
         db.any(add);
       }
     });
-    
-
-  
 });
 
 

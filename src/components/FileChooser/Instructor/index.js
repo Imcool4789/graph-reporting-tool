@@ -1,15 +1,18 @@
 import * as XLSX from "xlsx";
 import React from "react";
 import * as Chart from "chart.js";
-import e from "cors";
+import Bin from "../../../util/DataObjects/Bin";
+import Bins from "../../../util/DataObjects/Bins";
+import HelperFunctions from "../../../util/HelperFunctions";
+import html2canvas from "html2canvas";
+import pdfConverter from "jspdf";
+
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
     super(props);
     this.state = { excelData: {}, disabled: true, binData: {} };
-    this.chart={};
-  }
-  getState() {
-    this.grabData();
+    this.checked = false;
+    this.chart = {};
   }
   excelToJson(reader) {
     var fileData = reader.result;
@@ -21,7 +24,8 @@ export default class InstructorFileChooser extends React.Component {
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
-    this.setState({ excelData: data, disabled: false });
+    this.setState({ excelData: data });
+    this.buttonLogic();
   }
   csvToJson(reader) {
     var fileData = reader.result;
@@ -43,9 +47,22 @@ export default class InstructorFileChooser extends React.Component {
     }
     this.formatArray(result);
     data[0] = JSON.stringify(result);
-    console.log(data[0]);
-    this.setState({ excelData: data, disabled: false });
+    this.setState({ excelData: data });
+    this.buttonLogic();
   }
+  buttonLogic() {
+    if (this.state.excelData[0]!==undefined) {
+      let d = document.getElementById("error");
+      if (this.checked) {
+        this.setState({ disabled: false });
+        d.innerHTML = "";
+      } else {
+        d.innerHTML = "Please agree to the terms and conditions.";
+        this.setState({ disabled: true });
+      }
+    }
+  }
+
   formatArray(arr) {
     for (let i = 0; i < arr.length; i++) {
       delete arr[i]["First Name"];
@@ -105,7 +122,6 @@ export default class InstructorFileChooser extends React.Component {
   }
   populateChart(chartData) {
     let binData2 = this.findBins(chartData);
-    console.log(binData2);
     this.setState({ binData: binData2 });
     let buttonText = [];
     for (let prop in chartData[0]) {
@@ -124,26 +140,18 @@ export default class InstructorFileChooser extends React.Component {
       temp.appendChild(button);
     }
   }
-  getRandomColor() {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
   updateChart(event) {
-    if(this.chart instanceof Chart){
+    if (this.chart instanceof Chart) {
       this.chart.destroy();
     }
     const ctx = document.getElementById("myChart").getContext("2d");
     let dataTable = [];
     for (let i = 0; i < this.state.binData.length; i++) {
-      if (this.state.binData[i].getBin.getGa === event.path[0].innerText) {
+      if (this.state.binData[i].getBin().getGa() === event.path[0].innerText) {
         dataTable.push({
-          label: this.state.binData[i].getStream,
-          data: this.state.binData[i].getBin.getData,
-          backgroundColor: this.getRandomColor(),
+          label: this.state.binData[i].getStream(),
+          data: this.state.binData[i].getBin().getData(),
+          backgroundColor: HelperFunctions.getRandomColor(),
         });
       }
     }
@@ -158,12 +166,12 @@ export default class InstructorFileChooser extends React.Component {
       options: {
         maintainAspectRatio: false,
         legend: {
-          position: 'top',
+          position: "top",
         },
         title: {
           display: true,
           text: event.path[0].innerText,
-          position: 'bottom'
+          position: "bottom",
         },
         responsive: true,
         interaction: {
@@ -179,57 +187,9 @@ export default class InstructorFileChooser extends React.Component {
         },
       },
     };
-    this.chart= new Chart(ctx, config);
+    this.chart = new Chart(ctx, config);
   }
   findBins(data) {
-    var Bin = function (ga, data) {
-      this.ga = ga;
-      this.data = data;
-      Object.defineProperty(this, "getGa", {
-        get: function () {
-          return this.ga;
-        },
-      });
-      Object.defineProperty(this, "setGa", {
-        set: function (ga) {
-          this.ga = ga;
-        },
-      });
-      Object.defineProperty(this, "getData", {
-        get: function () {
-          return this.data;
-        },
-      });
-      Object.defineProperty(this, "setData", {
-        set: function (data) {
-          this.data = data;
-        },
-      });
-    };
-    var Bins = function (stream, bin) {
-      this.stream = stream;
-      this.bin = bin;
-      Object.defineProperty(this, "getStream", {
-        get: function () {
-          return this.stream;
-        },
-      });
-      Object.defineProperty(this, "setStream", {
-        set: function (stream) {
-          this.stream = stream;
-        },
-      });
-      Object.defineProperty(this, "getBin", {
-        get: function () {
-          return this.bin;
-        },
-      });
-      Object.defineProperty(this, "setBin", {
-        set: function (bin) {
-          this.bin = bin;
-        },
-      });
-    };
     let dataBins = [];
     for (var i = 0; i < data.length; i++) {
       var program = data[i]["program_name"];
@@ -239,12 +199,12 @@ export default class InstructorFileChooser extends React.Component {
             var added = false;
             for (let bin in dataBins) {
               if (
-                dataBins[bin].getStream === program &&
-                dataBins[bin].getBin.getGa === prop
+                dataBins[bin].getStream() === program &&
+                dataBins[bin].getBin().getGa() === prop
               ) {
-                let temp = dataBins[bin].getBin.getData;
+                let temp = dataBins[bin].getBin().getData();
                 temp[data[i][prop] - 1]++;
-                dataBins[bin].getBin.setData = temp;
+                dataBins[bin].getBin().setData(temp);
                 added = true;
                 break;
               }
@@ -264,16 +224,54 @@ export default class InstructorFileChooser extends React.Component {
     }
     return dataBins;
   }
+  convertToPdf(){
+    let chart=window.document.getElementById("myChart");
+    html2canvas(chart).then(canvas=>{
+      const img = canvas.toDataURL("image/png");
+      const pdf = new pdfConverter("l", "pt");
+      pdf.addImage(
+        img,
+        "png",
+        chart.offsetLeft,
+        chart.offsetTop,
+        chart.clientWidth,
+        chart.clientHeight
+      );
+      pdf.save("chart.pdf");
+    });
+  }
+  setCheck() {
+    this.checked = !this.checked;
+    this.buttonLogic();
+  }
+  getState() {
+    let r=window.confirm('Are you sure you wish to upload this spreadsheet?')
+    if (r){
+    this.grabData();
+    }
+  }
   render() {
     return (
       <div>
         <input type="file" onChange={this.loadFileXLSX.bind(this)} />
         <br />
+        <div>
+          <input type="checkbox" id="agree" onChange={this.setCheck.bind(this)} />
+          <label htmlFor="agree">
+            {" "}
+            I acknowledge that any previous existing data will be{" "}
+            <b>removed and replaced</b> with the new uploaded data.
+          </label>
+        </div>
         <button disabled={this.state.disabled} onClick={() => this.getState()}>
           Upload Graduate Attributes
         </button>
+        <div id="error"></div>
         <div id="buttonplaceholder"></div>
         <canvas id="myChart" width="400" height="400"></canvas>
+        <div>
+          <button onClick={(e) => this.convertToPdf(e)}>Export 2 PDF</button>
+        </div>
       </div>
     );
   }
