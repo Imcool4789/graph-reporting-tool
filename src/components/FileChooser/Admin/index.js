@@ -7,16 +7,6 @@ export default class AdminFileChooser extends React.Component {
     this.state = { excelData: {} };
   }
 
-  getState() {
-    let tmp = document.getElementById("contents");
-    tmp.innerHTML = this.state.excelData[0];
-  }
-
-  getState1(){
-    let tmp = document.getElementById("contents");
-    tmp.innerHTML = this.s;
-  }
-
   excelToJson(reader) {
     var fileData = reader.result;
     var wb = XLSX.read(fileData, { type: "binary" });
@@ -39,13 +29,11 @@ export default class AdminFileChooser extends React.Component {
     var data = {};
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
-      console.log(rowObj);
       this.formatArray(rowObj);
       var rowString = JSON.stringify(rowObj);
       data[i] = rowString;
     }
     this.setState({ excelData: data });
-    console.log(this.state.excelData[0]);
     this.grabData1();
   }
 
@@ -53,13 +41,11 @@ export default class AdminFileChooser extends React.Component {
     var x = document.getElementById("test").value;
     x = x.replace(".","_");
     x = "_" + x;
-    console.log(x.length);
     document.getElementById("demo").innerHTML = x;
     let obj = {};
     obj["GA"] = x;
 
     let c = '[' + JSON.stringify(obj) + ']';
-    console.log(c);
     fetch(
       process.env.NODE_ENV === "production"
       ? "https://graphing-report-tool.herokuapp.com/adminGA"
@@ -75,6 +61,7 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+        data.forEach(e=>document.getElementById("coursesWithGa").innerHTML+=e["table_name"]+"</br>");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -111,7 +98,6 @@ export default class AdminFileChooser extends React.Component {
       for (let key in arr[i]) {
         if (key.toLowerCase().includes("year")) {
           temp.push(arr[i][key]);
-          console.log(temp[0]);
         } else if (key.toLowerCase().includes("applicable gas")) {
           temp.push(arr[i][key]);
           let newKey = key.toLowerCase().replace("applicable gas", "GA").replace(".","_");
@@ -119,7 +105,6 @@ export default class AdminFileChooser extends React.Component {
           delete arr[i][key];
         } else if (key.toLowerCase().includes("course")){
           temp.push(arr[i][key]);
-          console.log(temp[1]);
         }
       }
     }
@@ -129,7 +114,6 @@ export default class AdminFileChooser extends React.Component {
     temp.shift();
     temp.unshift(year + "_" + course);
     this.s = temp;
-   // console.log(temp);
   }
 
   loadFileXLSX(event) {
@@ -174,7 +158,6 @@ export default class AdminFileChooser extends React.Component {
 
 
   grabData() {
-    console.log(this.state.excelData[0]);
     fetch(
       process.env.NODE_ENV === "production"
       ? "https://graphing-report-tool.herokuapp.com/adminSubmission"
@@ -190,6 +173,7 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -222,15 +206,15 @@ export default class AdminFileChooser extends React.Component {
   render() {
     return (
       <div>
-        <label for="avatar">Course Submission: </label>
+        <label htmlFor="1">Course Submission: </label>
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
         <br />
         <br />
-        <label for="avatar">Department Submission: </label>
+        <label htmlFor="2">Department Submission: </label>
         <input type="file" id="2" onChange={this.loadFileXLSX1.bind(this)} />
         <br />
         <br />
-        <label for="avatar">Search GA: </label>
+        <label htmlFor="test">Search GA: </label>
         <br />
         <input type="text" id="test"/>
         <br/>
@@ -238,8 +222,7 @@ export default class AdminFileChooser extends React.Component {
         <br />
         <p id="demo"></p>
         <br />
-        <button onClick={() => this.getState()}>Show Json</button>
-        <div id="contents"></div>
+        <div id="coursesWithGa"></div>
       </div>
     );
   }

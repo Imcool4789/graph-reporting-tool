@@ -24,11 +24,11 @@ const cn = {
   database: process.env.PG_DATABASE,
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 };
 const proConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }              
+  ssl: { rejectUnauthorized: false },
 };
 var db = pgp(process.env.NODE_ENV === "production" ? proConfig : cn);
 
@@ -44,100 +44,116 @@ app.get("/test", (req, res) => {
 
 app.post("/adminGA", (req, res) => {
   let temp = [];
-  for (let i = 0; i < req.body.length; i++){
+  for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
       if (key.toLowerCase().includes("ga")) {
         temp.push(req.body[i][key]);
-        console.log(temp[0]);
       }
     }
   }
   var x = temp[0];
   console.log(x);
-  var search = "select table_name from information_schema.columns where column_name = " + "'" + x + "';";
-  console.log(search);
-  var result = db.query(search);
-  console.log(result);
+  var search =
+    "select table_name from information_schema.columns where column_name = " +
+    "'" +
+    x +
+    "';";
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
 app.post("/departmentSubmission", (req, res) => {
-  var x = "CREATE TABLE " + "instructors " + "(email VARCHAR PRIMARY KEY, course VARCHAR, section VARCHAR);";
-  console.log(x);
+  var x =
+    "CREATE TABLE " +
+    "instructors " +
+    "(email VARCHAR PRIMARY KEY, course VARCHAR, section VARCHAR);";
   let temp1 = [];
   let temp2 = [];
   let temp3 = [];
-  for (let i = 0; i < req.body.length; i++){
-    console.log(req.body[i]);
+  for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
-      if (key.toLowerCase().includes("email")){
-          temp1.push(req.body[i][key]);
-          console.log(temp1[i]);
+      if (key.toLowerCase().includes("email")) {
+        temp1.push(req.body[i][key]);
       }
-      if (key.toLowerCase().includes("course")){
+      if (key.toLowerCase().includes("course")) {
         temp2.push(req.body[i][key]);
-        console.log(temp2[i]);
       }
-      if (key.toLowerCase().includes("section")){
+      if (key.toLowerCase().includes("section")) {
         temp3.push(req.body[i][key]);
-        console.log(temp3[i]);
       }
     }
   }
-  console.log(temp1);
-  console.log(temp2);
-  console.log(temp3);
-  db.any(x)
-  .then(() => {
-    for (let i = 0; i < temp1.length; i++){
-      db.any("INSERT INTO instructors(email, course, section) VALUES (" +"'"+ temp1[i] +"'"+ ","+ "'" + temp2[i] + "'"+ ","+ "'" + temp3[i] + "'" +");");
+  db.any(x).then(() => {
+    for (let i = 0; i < temp1.length; i++) {
+      db.any(
+        "INSERT INTO instructors(email, course, section) VALUES (" +
+          "'" +
+          temp1[i] +
+          "'" +
+          "," +
+          "'" +
+          temp2[i] +
+          "'" +
+          "," +
+          "'" +
+          temp3[i] +
+          "'" +
+          ");"
+      );
     }
   });
 });
 
 app.post("/adminDepartmentSubmission", (req, res) => {
-    var x = "CREATE TABLE " + "departments " + "(email VARCHAR PRIMARY KEY, dep_name VARCHAR);";
-    console.log(x);
-    let temp1 = [];
-    let temp2 = [];
-    
-    for (let i = 0; i < req.body.length; i++){
-      console.log(req.body[i]);
-      for (let key in req.body[i]) {
-        if (key.toLowerCase().includes("email")){
-            temp1.push(req.body[i][key]);
-            console.log(temp1[i]);
+  var x =
+    "CREATE TABLE " +
+    "departments " +
+    "(email VARCHAR PRIMARY KEY, dep_name VARCHAR);";
+  let temp1 = [];
+  let temp2 = [];
 
-        }
-        if (key.toLowerCase().includes("dep_name")){
-          temp2.push(req.body[i][key]);
-          console.log(temp2[i]);
-        }
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("email")) {
+        temp1.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("dep_name")) {
+        temp2.push(req.body[i][key]);
       }
     }
-    console.log(temp1);
-    console.log(temp2);
-    db.any(x)
-    .then(() => {
-      for (let i = 0; i < temp1.length; i++){
-        db.any("INSERT INTO departments(email, dep_name) VALUES (" +"'"+ temp1[i] +"'"+ ","+ "'" + temp2[i] + "'"+");");
-      }
-    });
-    
-    
+  }
+  db.any(x).then(() => {
+    for (let i = 0; i < temp1.length; i++) {
+      db.any(
+        "INSERT INTO departments(email, dep_name) VALUES (" +
+          "'" +
+          temp1[i] +
+          "'" +
+          "," +
+          "'" +
+          temp2[i] +
+          "'" +
+          ");"
+      );
+    }
+  });
 });
 
 app.post("/adminSubmission", (req, res) => {
-   let temp = [];
-   var s;
-  for (let i = 0; i < req.body.length; i++){
-    console.log(req.body[i]);
+  let temp = [];
+  var s;
+  for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
       if (key.toLowerCase().includes("year")) {
         temp.push(req.body[i][key]);
-        console.log(req.body[i][key]);
-      } else if(key.toLowerCase().includes("ga")) {
+      } else if (key.toLowerCase().includes("ga")) {
         temp.push(req.body[i][key]);
-      } else if (key.toLowerCase().includes("course")){
+      } else if (key.toLowerCase().includes("course")) {
         temp.push(req.body[i][key]);
       }
     }
@@ -147,20 +163,15 @@ app.post("/adminSubmission", (req, res) => {
   temp.shift();
   temp.shift();
   temp.unshift(year + "_" + course);
-  console.log(temp);
   var tableName = "_" + temp[0];
   var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY);";
-  console.log(table);
-  db.any(table)
-    .then(() => {
-      for (let i = 1; i < temp.length; i++){
-        var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
-        console.log(add);
-        db.any(add);
-      }
-    });
+  db.any(table).then(() => {
+    for (let i = 1; i < temp.length; i++) {
+      var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
+      db.any(add);
+    }
+  });
 });
-
 
 app.post("/courseData", (req, res) => {
   db.any("SELECT * from student_program_mapping;")
@@ -192,7 +203,7 @@ app.post("/courseData", (req, res) => {
                 tempQuery += req.body[i][keys[j]] + ",";
               }
             }
-            if (keys[keys.length-1] === "program_name") {
+            if (keys[keys.length - 1] === "program_name") {
               tempQuery += "'" + req.body[i][keys[keys.length - 1]] + "');";
             } else {
               tempQuery += req.body[i][keys[keys.length - 1]] + ");";
