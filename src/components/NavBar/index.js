@@ -13,13 +13,13 @@ const NavBar = () => {
         <NavBarContainer>
           <NavMenu>
             <NavItem>
-              <NavLinks to="/instructors">Instructors</NavLinks>
+              <NavLinks to="/instructor">Instructor</NavLinks>
             </NavItem>
             <NavItem>
-              <NavLinks to="/faculty">Department</NavLinks>
+              <NavLinks to="/department">Department</NavLinks>
             </NavItem>
             <NavItem>
-              <NavLinks to="/admin">Administrators</NavLinks>
+              <NavLinks to="/admin">Administrator</NavLinks>
             </NavItem>
           </NavMenu>
         </NavBarContainer>

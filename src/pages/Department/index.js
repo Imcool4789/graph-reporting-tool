@@ -1,7 +1,7 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
 import DepartmentFileChooser from '../../components/FileChooser/Department'
-const Faculties = () => {
+const Department = () => {
     return (
         <div>
             <NavBar></NavBar>
@@ -11,4 +11,4 @@ const Faculties = () => {
     )
 }
 
-export default Faculties
+export default Department
