@@ -16,7 +16,7 @@ const NavBar = () => {
               <NavLinks to="/instructors">Instructors</NavLinks>
             </NavItem>
             <NavItem>
-              <NavLinks to="/faculty">Faculties</NavLinks>
+              <NavLinks to="/faculty">Department</NavLinks>
             </NavItem>
             <NavItem>
               <NavLinks to="/admin">Administrators</NavLinks>
