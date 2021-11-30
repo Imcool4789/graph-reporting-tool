@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "bootstrap": "^5.1.0",
     "chart.js": "^2.9.4",
@@ -50,7 +49,9 @@
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "@testing-library/react": "^11.2.7"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JulianMendoza/GraphReportingTool.git"

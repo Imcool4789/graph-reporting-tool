@@ -2,7 +2,7 @@ import React from 'react'
 import NavBar from '../../components/NavBar'
 import AdminFileChooser from '../../components/FileChooser/Admin'
 
-const Administrators = () => {
+const Administrator = () => {
     return (
         <div>
             <NavBar></NavBar>
@@ -12,4 +12,4 @@ const Administrators = () => {
     )
 }
 
-export default Administrators
+export default Administrator
