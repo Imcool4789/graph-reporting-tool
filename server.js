@@ -54,10 +54,89 @@ app.post("/adminGA", (req, res) => {
   var x = temp[0];
   console.log(x);
   var search =
-    "select table_name from information_schema.columns where column_name = " +
+    "select distinct table_name from information_schema.columns where column_name ~ " +
+    "'^" +
+    x +
+    "';";
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/adminShowYear", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("year")) {
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var x = temp[0];
+  console.log(x);
+  var search =
+    "select distinct table_name from information_schema.tables where table_name ~ " +
+    "'^" +
+    x +
+    "';";
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/adminShowYearCourses", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("course")) {
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var x = temp[0];
+  console.log(x);
+  var search =
+    "select distinct table_name from information_schema.tables where table_name ~ " +
     "'" +
     x +
     "';";
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/adminShowProgram", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("year")) {
+        temp.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("course")) {
+        temp.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("program")) {
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  //var x = temp[0];
+  console.log(temp);
+  var search =
+    "SELECT * FROM " + temp[0] + temp[1] + " WHERE program_name = " + "'" + temp[2] + "';";
+    console.log(search);
   db.any(search)
     .then((rows) => {
       res.json(rows);
@@ -164,7 +243,7 @@ app.post("/adminSubmission", (req, res) => {
   temp.shift();
   temp.unshift(year + "_" + course);
   var tableName = "_" + temp[0];
-  var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY);";
+  var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
   db.any(table).then(() => {
     for (let i = 1; i < temp.length; i++) {
       var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
