@@ -132,7 +132,6 @@ export default class AdminFileChooser extends React.Component {
     obj["Program"] = temp[2];
 
     let c = '[' + JSON.stringify(obj) + ']';
-    console.log(c);
     fetch(
       process.env.NODE_ENV === "production"
       ? "https://graphing-report-tool.herokuapp.com/adminShowProgram"
@@ -148,7 +147,7 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("program").innerHTML+=e["*"]+"</br>");
+        data.forEach(e=>document.getElementById("program").innerHTML+=JSON.stringify(e)+"</br>");
       })
       .catch((error) => {
         console.error("Error:", error);
