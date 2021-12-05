@@ -1,6 +1,6 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
-import TableComponent from '../../components/Table'
+import LoginComponent from '../../components/Login'
 
 
 
@@ -8,7 +8,7 @@ const Home = () => {
     return (
         <>
         <NavBar></NavBar>
-        <TableComponent></TableComponent>
+        <LoginComponent></LoginComponent>
         </>
     )
 }
