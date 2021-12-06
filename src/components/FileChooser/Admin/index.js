@@ -106,7 +106,7 @@ export default class AdminFileChooser extends React.Component {
     let c = '[' + JSON.stringify(obj) + ']';
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminShowCourses"
+      ? "https://graphing-report-tool.herokuapp.com/adminShowYearCourses"
       : "http://localhost:5000/adminShowYearCourses",
       {
         method: "POST",
