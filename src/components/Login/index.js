@@ -35,7 +35,13 @@ class LoginComponent extends React.Component {
           "Content-Type": "application/json",
         },
         body:data1,
-      }).catch((error) => {
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("result").innerHTML+=JSON.stringify(e)+"</br>");
+      })
+      .catch((error) => {
         console.error("Error:", error);
       });
   }
