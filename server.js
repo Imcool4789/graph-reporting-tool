@@ -132,11 +132,51 @@ app.post("/adminShowProgram", (req, res) => {
       }
     }
   }
-  //var x = temp[0];
-  console.log(temp);
   var search =
     "SELECT * FROM " + temp[0] + temp[1] + " WHERE program_name = " + "'" + temp[2] + "';";
-    console.log(search);
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/adminShowDepartment", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("department")) {
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var search =
+    "SELECT email FROM departments WHERE dep_name =" + "'" + temp[0] + "';";
+  db.any(search)
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+app.post("/departmentShowInstructors", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < req.body.length; i++) {
+    for (let key in req.body[i]) {
+      if (key.toLowerCase().includes("course")) {
+        temp.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("number")) {
+        temp.push(req.body[i][key]);
+      }
+    }
+  }
+  var search =
+    "SELECT (email,section) FROM instructors WHERE course =" + "'" + temp[0] + "' AND number ='" + temp[1] + "';";
   db.any(search)
     .then((rows) => {
       res.json(rows);
@@ -150,10 +190,11 @@ app.post("/departmentSubmission", (req, res) => {
   var x =
     "CREATE TABLE " +
     "instructors " +
-    "(email VARCHAR PRIMARY KEY, course VARCHAR, section VARCHAR);";
+    "(id SERIAL PRIMARY KEY, email VARCHAR, course VARCHAR, number INTEGER, section VARCHAR);";
   let temp1 = [];
   let temp2 = [];
   let temp3 = [];
+  let temp4 = [];
   for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
       if (key.toLowerCase().includes("email")) {
@@ -162,15 +203,18 @@ app.post("/departmentSubmission", (req, res) => {
       if (key.toLowerCase().includes("course")) {
         temp2.push(req.body[i][key]);
       }
-      if (key.toLowerCase().includes("section")) {
+      if (key.toLowerCase().includes("number")) {
         temp3.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("section")) {
+        temp4.push(req.body[i][key]);
       }
     }
   }
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
       db.any(
-        "INSERT INTO instructors(email, course, section) VALUES (" +
+        "INSERT INTO instructors(email, course, number, section) VALUES (" +
           "'" +
           temp1[i] +
           "'" +
@@ -182,6 +226,10 @@ app.post("/departmentSubmission", (req, res) => {
           "'" +
           temp3[i] +
           "'" +
+          "," +
+          "'" +
+          temp4[i] +
+          "'" +
           ");"
       );
     }
@@ -192,7 +240,7 @@ app.post("/adminDepartmentSubmission", (req, res) => {
   var x =
     "CREATE TABLE " +
     "departments " +
-    "(email VARCHAR PRIMARY KEY, dep_name VARCHAR);";
+    "(id SERIAL PRIMARY KEY, email VARCHAR, dep_name VARCHAR);";
   let temp1 = [];
   let temp2 = [];
 

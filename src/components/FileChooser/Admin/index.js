@@ -38,6 +38,7 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showGA(){
+    document.getElementById("coursesWithGa").innerHTML=null;
     var x = document.getElementById("Ga").value;
     x = x.replace(".","_");
     x = "_" + x;
@@ -67,6 +68,7 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showYear(){
+    document.getElementById("coursesWithyears").innerHTML=null;
     var x = document.getElementById("Year").value;
     x = "_" + x;
     let obj = {};
@@ -96,6 +98,7 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showCourse(){
+    document.getElementById("courses").innerHTML=null;
     var x = document.getElementById("Course").value;
     let obj = {};
     obj["Course"] = x;
@@ -124,6 +127,7 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showProgram(){
+    document.getElementById("program").innerHTML=null;
     var x = document.getElementById("Program").value;
     var temp = x.split(",");
     let obj = {};
@@ -148,7 +152,36 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("program").innerHTML+=e["*"]+"</br>");
+        data.forEach(e=>document.getElementById("program").innerHTML+=JSON.stringify(e)+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  showdepartment(){
+    document.getElementById("department").innerHTML=null;
+    var x = document.getElementById("Department").value;
+    let obj = {};
+    obj["Department"] = x;
+
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/adminShowDepartment"
+      : "http://localhost:5000/adminShowDepartment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: c,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("department").innerHTML+=e["email"]+"</br>");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -332,6 +365,14 @@ export default class AdminFileChooser extends React.Component {
         <button onClick={this.showProgram} id="programButton" >Search</button>
         <br />
         <div id="program"></div>
+        <br />
+        <label htmlFor="Department">Search department: </label>
+        <br />
+        <input type="text" id="Department"/>
+        <br/>
+        <button onClick={this.showdepartment} id="departmentButton" >Search</button>
+        <br />
+        <div id="department"></div>
       </div>
     );
   }

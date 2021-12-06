@@ -54,6 +54,37 @@ export default class DepartmentFileChooser extends React.Component {
     this.grabData();
   }
 
+  showInstructors(){
+    document.getElementById("instructors").innerHTML=null;
+    var x = document.getElementById("Instructor").value;
+    var temp = x.split(",");
+    let obj = {};
+    obj["Course"] = temp[0];
+    obj["Number"] = temp[1];
+
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/departmentShowInstructors"
+      : "http://localhost:5000/departmentShowInstructors",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: c,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("instructors").innerHTML+=JSON.stringify(e)+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
   formatArray(arr) {
     let temp =[];
     for (let i = 0; i < arr.length; i++) {
@@ -132,8 +163,13 @@ export default class DepartmentFileChooser extends React.Component {
         <br />
         <p id="demo"></p>
         <br />
-        <button onClick={() => this.getState()}>Show Json</button>
-        <div id="contents"></div>
+        <label htmlFor="Instructor">Search Instructors: </label>
+        <br />
+        <input type="text" id="Instructor"/>
+        <br/>
+        <button onClick={this.showInstructors} id="instructorsButton" >Search</button>
+        <br />
+        <div id="instructors"></div>
       </div>
     );
   }
