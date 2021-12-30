@@ -29,7 +29,7 @@ router.post("/compare", (req, res) => {
     .then((rows) => {
       var result = bcrypt.compareSync(body.password, rows[0].hash);
       if (result) {
-        console.log("Password correct");
+        db.any("update secret set uid ='"+req.sessionID+"' where email ='"+body.email+"';");
         db.any("SELECT 1 FROM admins WHERE email = '" + body.email + "';").then(
           (rows) => {
             roles["Admin"] = rows;
@@ -45,7 +45,15 @@ router.post("/compare", (req, res) => {
                 roles["Department Head"] = rows;
               }).then(()=>{
                 res.json(roles);
-                console.log(roles);
+                if (roles["Admin"].length > 0) {
+                    req.session.admin=true;
+                }
+                if (roles["Instructor"].length > 0) {
+                    req.session.instructor=true;
+                }
+                if (roles["Department Head"].length > 0) {
+                    req.session.deparment=true;
+                }
               });
             });
           }

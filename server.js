@@ -1,9 +1,22 @@
-const connect= require("./connect");
-const db=connect.db;
-const app=connect.app;
-const PORT=connect.PORT;
-const loginRoutes=require("./auth");
-app.use("/auth",loginRoutes);
+const connect = require("./connect");
+const db = connect.db;
+const app = connect.app;
+const PORT = connect.PORT;
+const loginRoutes = require("./auth");
+const session = require("express-session");
+const uuid =require("uuid");
+app.use(
+  session({
+    secret: "secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 8604000 },
+    genid:function(req){
+      return uuid.v4();
+    },
+  })
+);
+app.use("/auth", loginRoutes);
 app.get("/test", (req, res) => {
   db.any("SELECT * from student_attributes;")
     .then((rows) => {
@@ -106,8 +119,14 @@ app.post("/adminShowProgram", (req, res) => {
   //var x = temp[0];
   console.log(temp);
   var search =
-    "SELECT * FROM " + temp[0] + temp[1] + " WHERE program_name = " + "'" + temp[2] + "';";
-    console.log(search);
+    "SELECT * FROM " +
+    temp[0] +
+    temp[1] +
+    " WHERE program_name = " +
+    "'" +
+    temp[2] +
+    "';";
+  console.log(search);
   db.any(search)
     .then((rows) => {
       res.json(rows);
@@ -214,7 +233,10 @@ app.post("/adminSubmission", (req, res) => {
   temp.shift();
   temp.unshift(year + "_" + course);
   var tableName = "_" + temp[0];
-  var table = "CREATE TABLE " + tableName + " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
+  var table =
+    "CREATE TABLE " +
+    tableName +
+    " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
   db.any(table).then(() => {
     for (let i = 1; i < temp.length; i++) {
       var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
