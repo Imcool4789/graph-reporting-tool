@@ -38,13 +38,11 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showGA(){
-    var x = document.getElementById("test").value;
+    var x = document.getElementById("Ga").value;
     x = x.replace(".","_");
     x = "_" + x;
-    document.getElementById("demo").innerHTML = x;
     let obj = {};
     obj["GA"] = x;
-
     let c = '[' + JSON.stringify(obj) + ']';
     fetch(
       process.env.NODE_ENV === "production"
@@ -62,6 +60,94 @@ export default class AdminFileChooser extends React.Component {
       .then((data) => {
         console.log("Success:", data);
         data.forEach(e=>document.getElementById("coursesWithGa").innerHTML+=e["table_name"]+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  showYear(){
+    var x = document.getElementById("Year").value;
+    x = "_" + x;
+    let obj = {};
+    obj["Year"] = x;
+
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/adminShowYear"
+      : "http://localhost:5000/adminShowYear",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: c,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("coursesWithyears").innerHTML+=e["table_name"]+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  showCourse(){
+    var x = document.getElementById("Course").value;
+    let obj = {};
+    obj["Course"] = x;
+
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/adminShowCourses"
+      : "http://localhost:5000/adminShowYearCourses",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: c,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("courses").innerHTML+=e["table_name"]+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  showProgram(){
+    var x = document.getElementById("Program").value;
+    var temp = x.split(",");
+    let obj = {};
+    obj["Year"] = "_" + temp[0];
+    obj["Course"] = "_" + temp[1];
+    obj["Program"] = temp[2];
+
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/adminShowProgram"
+      : "http://localhost:5000/adminShowProgram",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: c,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("program").innerHTML+=JSON.stringify(e)+"</br>");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -214,15 +300,37 @@ export default class AdminFileChooser extends React.Component {
         <input type="file" id="2" onChange={this.loadFileXLSX1.bind(this)} />
         <br />
         <br />
-        <label htmlFor="test">Search GA: </label>
+        <label htmlFor="Year">Search Year: </label>
         <br />
-        <input type="text" id="test"/>
+        <input type="text" id="Year"/>
         <br/>
-        <button onClick={this.showGA} id="testButton" >Search</button>
+        <button onClick={this.showYear} id="yearButton" >Search</button>
         <br />
-        <p id="demo"></p>
+        <div id="coursesWithyears"></div>
+        <br />
+        <label htmlFor="Course">Search Courses: </label>
+        <br />
+        <input type="text" id="Course"/>
+        <br/>
+        <button onClick={this.showCourse} id="courseButton" >Search</button>
+        <br />
+        <div id="courses"></div>
+        <br/>
+        <label htmlFor="Ga">Search GA: </label>
+        <br />
+        <input type="text" id="Ga"/>
+        <br/>
+        <button onClick={this.showGA} id="gaButton" >Search</button>
         <br />
         <div id="coursesWithGa"></div>
+        <br />
+        <label htmlFor="Program">Search program: </label>
+        <br />
+        <input type="text" id="Program"/>
+        <br/>
+        <button onClick={this.showProgram} id="programButton" >Search</button>
+        <br />
+        <div id="program"></div>
       </div>
     );
   }
