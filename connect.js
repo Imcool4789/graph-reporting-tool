@@ -16,7 +16,6 @@ var pgp = require("pg-promise")(/* options */);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "build")));
 }
-
 const cn = {
   host: process.env.PG_HOST,
   port: process.env.PG_PORT,

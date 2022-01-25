@@ -6,7 +6,8 @@ const db = connect.db;
 const app = connect.app;
 const PORT = connect.PORT;
 const express = connect.express;
-
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 const router = express.Router();
 router.post("/register", (req, res) => {
   const body = req.body;
@@ -21,6 +22,9 @@ router.post("/register", (req, res) => {
   ).catch((error) => {
     console.error("Error:", error);
   });
+});
+router.post("/cookie", (req, res) => {
+  console.log(req.cookies);
 });
 router.post("/compare", (req, res) => {
   let roles = {};
@@ -56,16 +60,17 @@ router.post("/compare", (req, res) => {
                   roles["Department Head"] = rows;
                 })
                 .then(() => {
-                  res.json(roles);
                   if (roles["Admin"].length > 0) {
-                    req.session.admin = true;
+                    res.cookie("admin", "true");
                   }
                   if (roles["Instructor"].length > 0) {
-                    req.session.instructor = true;
+                    res.cookie("instructor", "true");
                   }
                   if (roles["Department Head"].length > 0) {
-                    req.session.deparment = true;
+                    res.cookie("department", "true");
                   }
+                  res.cookie("sessionID", req.sessionID);
+                  res.json(roles);
                 });
             });
           });

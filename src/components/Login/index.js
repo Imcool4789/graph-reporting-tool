@@ -17,7 +17,7 @@ class LoginComponent extends React.Component {
     fetch(
       process.env.NODE_ENV === "production"
         ? "https://graphing-report-tool.herokuapp.com/auth/register"
-        : "http://localhost:5000/auth/register",
+        : "/auth/register",
       {
         method: "POST",
         headers: {
@@ -39,7 +39,7 @@ class LoginComponent extends React.Component {
     fetch(
       process.env.NODE_ENV === "production"
         ? "https://graphing-report-tool.herokuapp.com/auth/compare"
-        : "http://localhost:5000/auth/compare",
+        : "/auth/compare",
       {
         method: "POST",
         headers: {
@@ -62,6 +62,7 @@ class LoginComponent extends React.Component {
           document.getElementById("result").innerHTML +=
             "ROLE: " + data["Department Head"][0].dep_name+"</br>";
         }
+        window.location.reload(false);
       })
       .catch((error) => {
         console.error("Error:", error);
