@@ -1,0 +1,31 @@
+Invalid username or password
+
+logout
+session verify roles not just cookies
+
+John fix queries
+
+
+Instructor UI
+courses teaching -> SPA based off what the user clicks course code ->select file
+enter text message
+click acknowledgement
+submit
+based off submission
+ 
+render generic graph
+
+courses teaching -> status -> not submitted -> waiting for approval -> approved -> requires action
+
+Department UI
+Department submission for instructors
+Approve GA's submission
+graph generation logic
+allow user to select course codes
+
+Graph generation -> make sure to populate based off engineering program
+
+Admin UI
+course -> mapping GA's submission
+department head submission
+all logic of department included for Admin UI
