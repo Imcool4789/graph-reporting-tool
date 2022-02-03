@@ -51,7 +51,7 @@ class LoginComponent extends React.Component {
     )
       .then((response) => {
         console.log(response.status);
-        if(response.status == 403){
+        if(response.status === 403){
           alert('Incorrect Email or Password!');
         }
         response.json()})

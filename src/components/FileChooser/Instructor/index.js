@@ -243,8 +243,6 @@ export default class InstructorFileChooser extends React.Component {
 
   SendMessage(){
     var x = document.getElementById("Message").value;
-    let obj = {};
-    let c = '[' + JSON.stringify(obj) + ']';
     fetch(
       process.env.NODE_ENV === "production"
       ? "https://graphing-report-tool.herokuapp.com/sendMessage"
