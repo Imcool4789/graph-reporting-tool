@@ -1,6 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import alert from 'alert'
 
 class LoginComponent extends React.Component {
   /**
@@ -48,7 +49,12 @@ class LoginComponent extends React.Component {
         body: data1,
       }
     )
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response.status);
+        if(response.status == 403){
+          alert('Incorrect Email or Password!');
+        }
+        response.json()})
       .then((data) => {
         console.log("Success:", data);
         if (data["Admin"].length > 0) {
