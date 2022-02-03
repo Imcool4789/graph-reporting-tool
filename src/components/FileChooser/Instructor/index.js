@@ -240,6 +240,33 @@ export default class InstructorFileChooser extends React.Component {
       pdf.save("chart.pdf");
     });
   }
+
+  SendMessage(){
+    var x = document.getElementById("Message").value;
+    let obj = {};
+    let c = '[' + JSON.stringify(obj) + ']';
+    fetch(
+      process.env.NODE_ENV === "production"
+      ? "https://graphing-report-tool.herokuapp.com/sendMessage"
+      : "http://localhost:5000/sendMessage",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: x,
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        data.forEach(e=>document.getElementById("coursesWithGa").innerHTML+=e["table_name"]+"</br>");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
   setCheck() {
     this.checked = !this.checked;
     this.buttonLogic();
@@ -248,29 +275,35 @@ export default class InstructorFileChooser extends React.Component {
     let r=window.confirm('Are you sure you wish to upload this spreadsheet?')
     if (r){
     this.grabData();
+    this.SendMessage();
     }
   }
   render() {
     return (
+      
       <div>
-        <input type="file" onChange={this.loadFileXLSX.bind(this)} />
+        <input type="file" onChange={this.loadFileXLSX.bind(this)} style={{margin : '10px'}}/>
+        <br />
+        <div style={{margin : '10px'}}>Add a Message: </div>
+        <textarea id="Message" name="Messahe" rows="8" cols="70" style={{margin : '10px'}}/>
         <br />
         <div>
-          <input type="checkbox" id="agree" onChange={this.setCheck.bind(this)} />
+          <input type="checkbox" id="agree" onChange={this.setCheck.bind(this)} style={{margin : '10px'}} />
           <label htmlFor="agree">
             {" "}
-            I acknowledge that any previous existing data will be{" "}
+             I acknowledge that any previous existing data will be{" "}
             <b>removed and replaced</b> with the new uploaded data.
           </label>
         </div>
-        <button disabled={this.state.disabled} onClick={() => this.getState()}>
+        <br />
+        <button disabled={this.state.disabled} onClick={() => this.getState()} style={{margin : '10px'}}>
           Upload Graduate Attributes
         </button>
         <div id="error"></div>
         <div id="buttonplaceholder"></div>
         <canvas id="myChart" width="400" height="400"></canvas>
         <div>
-          <button onClick={(e) => this.convertToPdf(e)}>Export 2 PDF</button>
+          <button onClick={(e) => this.convertToPdf(e)} style={{margin : '10px'}}>Export 2 PDF</button>
         </div>
       </div>
     );

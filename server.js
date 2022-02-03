@@ -76,6 +76,12 @@ app.post("/adminShowYear", (req, res) => {
     });
 });
 
+app.post("/sendMessage", (req, res) => {
+  const body = req.body;
+  console.log(body);
+  db.any("update message set note="+ "'" + body + "'" +" where course="+ "'" +"f21_sysc4101_a"+"';");
+});
+
 app.post("/adminShowYearCourses", (req, res) => {
   let temp = [];
   for (let i = 0; i < req.body.length; i++) {

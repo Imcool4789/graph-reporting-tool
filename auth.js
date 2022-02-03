@@ -76,7 +76,10 @@ router.post("/compare", (req, res) => {
           });
         } else {
           console.log("Password wrong");
+          res.sendStatus(403);
         }
+      } else {
+        res.sendStatus(403);
       }
     })
     .catch((error) => {
