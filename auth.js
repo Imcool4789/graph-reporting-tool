@@ -26,7 +26,34 @@ router.post("/register", (req, res) => {
 router.post("/access", (req, res) => {
   //req.body
   //body.sessionID
-  console.log(req.cookies);
+  let roles ={};
+  const body;
+  db.any("select instructors.course,instructors.number,instructors.section from instructors,secret where uid='" + body.sessionID + "' and instructors.email=secret.email;")
+  .then((rows) => {
+      roles["Instructor"] = rows;
+      db.any("select dep_name from departments,secret where uid='" + body.sessionID + "'and departments.email=secret.email;")
+      .then((rows) => {
+        roles["Department Head"] = rows;
+        db.any("select 1 from admins,secret where uid='" + body.sessionID + "'and admins.email=secret.email;")
+        .then((rows) => {
+          roles["Admin"] = rows;
+        })
+        .then(() => {
+          if (roles["Admin"].length > 0) {
+            res.cookie("admin", "true");
+          }
+          if (roles["Instructor"].length > 0) {
+            res.cookie("instructor", "true");
+          }
+          if (roles["Department Head"].length > 0) {
+            res.cookie("department", "true");
+          }
+          res.cookie("sessionID", req.sessionID);
+          res.json(roles);
+        });
+      });
+    });
+  //console.log(req.cookies);
 });
 router.post("/compare", (req, res) => {
   let roles = {};
