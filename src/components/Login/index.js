@@ -56,19 +56,7 @@ class LoginComponent extends React.Component {
         }
         response.json()})
       .then((data) => {
-        console.log("Success:", data);
-        if (data["Admin"].length > 0) {
-          document.getElementById("result").innerHTML += "ROLE: Admin </br>";
-        }
-        if (data["Instructor"].length > 0) {
-          document.getElementById("result").innerHTML +=
-            "ROLE: " + data["Instructor"][0].row+"</br>";
-        }
-        if (data["Department Head"].length > 0) {
-          document.getElementById("result").innerHTML +=
-            "ROLE: " + data["Department Head"][0].dep_name+"</br>";
-        }
-        window.location.reload(false);
+        window.location.reload(true);
       })
       .catch((error) => {
         console.error("Error:", error);

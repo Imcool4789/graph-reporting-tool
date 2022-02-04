@@ -23,7 +23,9 @@ router.post("/register", (req, res) => {
     console.error("Error:", error);
   });
 });
-router.post("/cookie", (req, res) => {
+router.post("/access", (req, res) => {
+  //req.body
+  //body.sessionID
   console.log(req.cookies);
 });
 router.post("/compare", (req, res) => {
