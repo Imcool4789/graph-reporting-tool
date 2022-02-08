@@ -278,7 +278,6 @@ export default class InstructorFileChooser extends React.Component {
   }
   render() {
     return (
-      
       <div>
         <input type="file" onChange={this.loadFileXLSX.bind(this)} style={{margin : '10px'}}/>
         <br />

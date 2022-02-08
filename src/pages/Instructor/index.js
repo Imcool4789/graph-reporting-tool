@@ -5,7 +5,6 @@ const Instructor = () => {
     return (
         <div>
         <NavBar></NavBar>
-        Welcome instructor.
         <InstructorFileChooser></InstructorFileChooser>
         </div>
     )

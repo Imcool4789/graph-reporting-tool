@@ -6,7 +6,6 @@ const Administrator = () => {
     return (
         <div>
             <NavBar></NavBar>
-            Welcome Administrator
             <AdminFileChooser></AdminFileChooser>
         </div>
     )

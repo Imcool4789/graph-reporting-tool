@@ -24,40 +24,39 @@ router.post("/register", (req, res) => {
   });
 });
 router.post("/access", (req, res) => {
-  //req.body
-  //body.sessionID
-  let roles ={};
-  const body;
-  db.any("select instructors.course,instructors.number,instructors.section from instructors,secret where uid='" + body.sessionID + "' and instructors.email=secret.email;")
-  .then((rows) => {
-      roles["Instructor"] = rows;
-      db.any("select dep_name from departments,secret where uid='" + body.sessionID + "'and departments.email=secret.email;")
-      .then((rows) => {
-        roles["Department Head"] = rows;
-        db.any("select 1 from admins,secret where uid='" + body.sessionID + "'and admins.email=secret.email;")
+  const body = req.body;
+  console.log(body.sessionID);
+  let roles = {};
+  db.any(
+    "select instructors.course,instructors.number,instructors.section from instructors,secret where uid='" +
+      body.sessionID +
+      "' and instructors.email=secret.email;"
+  ).then((rows) => {
+    roles["Instructor"] = rows;
+    db.any(
+      "select dep_name from departments,secret where uid='" +
+        body.sessionID +
+        "'and departments.email=secret.email;"
+    ).then((rows) => {
+      roles["Department Head"] = rows;
+      db.any(
+        "select 1 from admins,secret where uid='" +
+          body.sessionID +
+          "'and admins.email=secret.email;"
+      )
         .then((rows) => {
           roles["Admin"] = rows;
         })
         .then(() => {
-          if (roles["Admin"].length > 0) {
-            res.cookie("admin", "true");
-          }
-          if (roles["Instructor"].length > 0) {
-            res.cookie("instructor", "true");
-          }
-          if (roles["Department Head"].length > 0) {
-            res.cookie("department", "true");
-          }
-          res.cookie("sessionID", req.sessionID);
+          console.log(roles);
           res.json(roles);
         });
-      });
     });
-  //console.log(req.cookies);
+  });
 });
 router.post("/compare", (req, res) => {
-  let roles = {};
   const body = req.body;
+  console.log(req.body);
   db.any("SELECT hash from secret where email ='" + body.email + "';")
     .then((rows) => {
       if (rows.length > 0) {
@@ -70,41 +69,12 @@ router.post("/compare", (req, res) => {
               body.email +
               "';"
           );
-          db.any(
-            "SELECT 1 FROM admins WHERE email = '" + body.email + "';"
-          ).then((rows) => {
-            roles["Admin"] = rows;
-            db.any(
-              "SELECT (course, number, section) FROM instructors WHERE email = '" +
-                body.email +
-                "';"
-            ).then((rows) => {
-              roles["Instructor"] = rows;
-              db.any(
-                "SELECT dep_name FROM departments WHERE email = '" +
-                  body.email +
-                  "';"
-              )
-                .then((rows) => {
-                  roles["Department Head"] = rows;
-                })
-                .then(() => {
-                  if (roles["Admin"].length > 0) {
-                    res.cookie("admin", "true");
-                  }
-                  if (roles["Instructor"].length > 0) {
-                    res.cookie("instructor", "true");
-                  }
-                  if (roles["Department Head"].length > 0) {
-                    res.cookie("department", "true");
-                  }
-                  res.cookie("sessionID", req.sessionID);
-                  res.json(roles);
-                });
-            });
-          });
+          res.cookie("sessionID", req.sessionID);
+          res.sendStatus(200);
         } else {
-          console.log("Password wrong");
+          console.log(
+            "The username or password that you have entered is wrong"
+          );
           res.sendStatus(403);
         }
       } else {

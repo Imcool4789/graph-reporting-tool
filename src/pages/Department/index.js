@@ -5,7 +5,6 @@ const Department = () => {
     return (
         <div>
             <NavBar></NavBar>
-            This is the department section
             <DepartmentFileChooser></DepartmentFileChooser>
        </div>
     )
