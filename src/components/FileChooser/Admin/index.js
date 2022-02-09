@@ -1,10 +1,16 @@
 import * as XLSX from "xlsx";
 import React from "react";
+import InputGroup from "react-bootstrap/InputGroup";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Dropdown from "react-bootstrap/Dropdown";
+import FormControl from "react-bootstrap/FormControl";
+
 export default class AdminFileChooser extends React.Component {
   constructor(props) {
     super(props);
     this.s = [];
     this.state = { excelData: {} };
+    
   }
 
   excelToJson(reader) {
@@ -37,17 +43,17 @@ export default class AdminFileChooser extends React.Component {
     this.grabData1();
   }
 
-  showGA(){
+  showGA() {
     var x = document.getElementById("Ga").value;
-    x = x.replace(".","_");
+    x = x.replace(".", "_");
     x = "_" + x;
     let obj = {};
     obj["GA"] = x;
-    let c = '[' + JSON.stringify(obj) + ']';
+    let c = "[" + JSON.stringify(obj) + "]";
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminGA"
-      : "http://localhost:5000/adminGA",
+        ? "https://graphing-report-tool.herokuapp.com/adminGA"
+        : "http://localhost:5000/adminGA",
       {
         method: "POST",
         headers: {
@@ -59,24 +65,28 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("coursesWithGa").innerHTML+=e["table_name"]+"</br>");
+        data.forEach(
+          (e) =>
+            (document.getElementById("coursesWithGa").innerHTML +=
+              e["table_name"] + "</br>")
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
 
-  showYear(){
+  showYear() {
     var x = document.getElementById("Year").value;
     x = "_" + x;
     let obj = {};
     obj["Year"] = x;
 
-    let c = '[' + JSON.stringify(obj) + ']';
+    let c = "[" + JSON.stringify(obj) + "]";
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminShowYear"
-      : "http://localhost:5000/adminShowYear",
+        ? "https://graphing-report-tool.herokuapp.com/adminShowYear"
+        : "http://localhost:5000/adminShowYear",
       {
         method: "POST",
         headers: {
@@ -88,23 +98,27 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("coursesWithyears").innerHTML+=e["table_name"]+"</br>");
+        data.forEach(
+          (e) =>
+            (document.getElementById("coursesWithyears").innerHTML +=
+              e["table_name"] + "</br>")
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
 
-  showCourse(){
+  showCourse() {
     var x = document.getElementById("Course").value;
     let obj = {};
     obj["Course"] = x;
 
-    let c = '[' + JSON.stringify(obj) + ']';
+    let c = "[" + JSON.stringify(obj) + "]";
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminShowCourses"
-      : "http://localhost:5000/adminShowYearCourses",
+        ? "https://graphing-report-tool.herokuapp.com/adminShowCourses"
+        : "http://localhost:5000/adminShowYearCourses",
       {
         method: "POST",
         headers: {
@@ -116,14 +130,18 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("courses").innerHTML+=e["table_name"]+"</br>");
+        data.forEach(
+          (e) =>
+            (document.getElementById("courses").innerHTML +=
+              e["table_name"] + "</br>")
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
 
-  showProgram(){
+  showProgram() {
     var x = document.getElementById("Program").value;
     var temp = x.split(",");
     let obj = {};
@@ -131,11 +149,11 @@ export default class AdminFileChooser extends React.Component {
     obj["Course"] = "_" + temp[1];
     obj["Program"] = temp[2];
 
-    let c = '[' + JSON.stringify(obj) + ']';
+    let c = "[" + JSON.stringify(obj) + "]";
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminShowProgram"
-      : "http://localhost:5000/adminShowProgram",
+        ? "https://graphing-report-tool.herokuapp.com/adminShowProgram"
+        : "http://localhost:5000/adminShowProgram",
       {
         method: "POST",
         headers: {
@@ -147,7 +165,11 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-        data.forEach(e=>document.getElementById("program").innerHTML+=JSON.stringify(e)+"</br>");
+        data.forEach(
+          (e) =>
+            (document.getElementById("program").innerHTML +=
+              JSON.stringify(e) + "</br>")
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -179,17 +201,20 @@ export default class AdminFileChooser extends React.Component {
   }
 
   formatArray(arr) {
-    let temp =[];
+    let temp = [];
     for (let i = 0; i < arr.length; i++) {
       for (let key in arr[i]) {
         if (key.toLowerCase().includes("year")) {
           temp.push(arr[i][key]);
         } else if (key.toLowerCase().includes("applicable gas")) {
           temp.push(arr[i][key]);
-          let newKey = key.toLowerCase().replace("applicable gas", "GA").replace(".","_");
+          let newKey = key
+            .toLowerCase()
+            .replace("applicable gas", "GA")
+            .replace(".", "_");
           arr[i][newKey] = arr[i][key];
           delete arr[i][key];
-        } else if (key.toLowerCase().includes("course")){
+        } else if (key.toLowerCase().includes("course")) {
           temp.push(arr[i][key]);
         }
       }
@@ -242,12 +267,11 @@ export default class AdminFileChooser extends React.Component {
     }
   }
 
-
   grabData() {
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminSubmission"
-      : "http://localhost:5000/adminSubmission",
+        ? "https://graphing-report-tool.herokuapp.com/adminSubmission"
+        : "http://localhost:5000/adminSubmission",
       {
         method: "POST",
         headers: {
@@ -259,7 +283,6 @@ export default class AdminFileChooser extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
-
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -270,8 +293,8 @@ export default class AdminFileChooser extends React.Component {
     console.log(this.state.excelData[0]);
     fetch(
       process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/adminDepartmentSubmission"
-      : "http://localhost:5000/adminDepartmentSubmission",
+        ? "https://graphing-report-tool.herokuapp.com/adminDepartmentSubmission"
+        : "http://localhost:5000/adminDepartmentSubmission",
       {
         method: "POST",
         headers: {
@@ -302,35 +325,82 @@ export default class AdminFileChooser extends React.Component {
         <br />
         <label htmlFor="Year">Search Year: </label>
         <br />
-        <input type="text" id="Year"/>
-        <br/>
-        <button onClick={this.showYear} id="yearButton" >Search</button>
+        <input type="text" id="Year" />
+        <br />
+        <button onClick={this.showYear} id="yearButton">
+          Search
+        </button>
         <br />
         <div id="coursesWithyears"></div>
         <br />
         <label htmlFor="Course">Search Courses: </label>
         <br />
-        <input type="text" id="Course"/>
-        <br/>
-        <button onClick={this.showCourse} id="courseButton" >Search</button>
+        <input type="text" id="Course" />
+        <br />
+        <button onClick={this.showCourse} id="courseButton">
+          Search
+        </button>
         <br />
         <div id="courses"></div>
-        <br/>
+        <br />
         <label htmlFor="Ga">Search GA: </label>
         <br />
-        <input type="text" id="Ga"/>
-        <br/>
-        <button onClick={this.showGA} id="gaButton" >Search</button>
+        <input type="text" id="Ga" />
+        <br />
+        <button onClick={this.showGA} id="gaButton">
+          Search
+        </button>
         <br />
         <div id="coursesWithGa"></div>
         <br />
         <label htmlFor="Program">Search program: </label>
         <br />
-        <input type="text" id="Program"/>
-        <br/>
-        <button onClick={this.showProgram} id="programButton" >Search</button>
+        <input type="text" id="Program" />
+        <br />
+        <button onClick={this.showProgram} id="programButton">
+          Search
+        </button>
         <br />
         <div id="program"></div>
+        <InputGroup className="mb-3">
+          <DropdownButton
+            variant="outline-secondary"
+            title="Select Course Code"
+            id="input-group-dropdown-1"
+            //onSelect={this.handleSelect}
+          >
+            <Dropdown.Item eventKey="option-1">Action</Dropdown.Item>
+            <Dropdown.Item eventKey="option-2">Another action</Dropdown.Item>
+            <Dropdown.Item eventKey="option-3">
+              Something else here
+            </Dropdown.Item>
+          </DropdownButton>
+          <FormControl disabled="true" />
+          <DropdownButton
+            variant="outline-secondary"
+            title="Select Year offered"
+            id="input-group-dropdown-2"
+            align="middle"
+          >
+            <Dropdown.Item href="#">Action</Dropdown.Item>
+            <Dropdown.Item href="#">Another action</Dropdown.Item>
+            <Dropdown.Item href="#">Something else here</Dropdown.Item>
+          </DropdownButton>
+          <FormControl disabled="true" />
+          <DropdownButton
+            variant="outline-secondary"
+            title="Select Term and Section"
+            id="input-group-dropdown-3"
+            align="end"
+          >
+            <Dropdown.Item href="#">Action</Dropdown.Item>
+            <Dropdown.Item href="#">Another action</Dropdown.Item>
+            <Dropdown.Item href="#">Something else here</Dropdown.Item>
+          </DropdownButton>
+        </InputGroup>
+        <button>
+          Add additional course
+        </button>
       </div>
     );
   }
