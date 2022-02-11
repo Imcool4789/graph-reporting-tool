@@ -29,3 +29,4 @@ Admin UI
 course -> mapping GA's submission
 department head submission
 all logic of department included for Admin UI
+pass course name coursename 

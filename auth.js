@@ -30,9 +30,16 @@ router.post("/access", (req, res) => {
   let subm = {};
   db.any("select email from secret where uid='" + body.sessionID +"';")
     .then((rows) => {
-       subm = rows[0]["email"];
+      subm = rows[0]["email"];
+      subm = subm.replace(".","");
+      subm = subm.replace("@","");
       console.log(subm);
+      db.any("select coursename,timestamp from " + subm + ";")
+      .then((rows) => {
+        roles["timestamp"] = rows;
+      });
     });
+  
 
   db.any(
     "select instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +

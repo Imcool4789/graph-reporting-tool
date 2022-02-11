@@ -146,11 +146,13 @@ app.post("/departmentSubmission", (req, res) => {
   var x =
     "CREATE TABLE " +
     "instructors " +
-    "(id serial primary key, email VARCHAR, course VARCHAR, section VARCHAR, year integer);";
+    "(id serial primary key, email VARCHAR, course VARCHAR, number integer, section VARCHAR, year integer, term varchar);";
   let temp1 = [];
   let temp2 = [];
   let temp3 = [];
   let temp4 = [];
+  let temp5 = [];
+  let temp6 = [];
   for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
       if (key.toLowerCase().includes("email")) {
@@ -159,10 +161,16 @@ app.post("/departmentSubmission", (req, res) => {
       if (key.toLowerCase().includes("course")) {
         temp2.push(req.body[i][key]);
       }
+      if (key.toLowerCase().includes("number")) {
+        temp2.push(req.body[i][key]);
+      }
       if (key.toLowerCase().includes("section")) {
         temp3.push(req.body[i][key]);
       }
       if (key.toLowerCase().includes("year")) {
+        temp3.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("term")) {
         temp3.push(req.body[i][key]);
       }
     }
@@ -170,7 +178,7 @@ app.post("/departmentSubmission", (req, res) => {
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
       db.any(
-        "INSERT INTO instructors(email, course, section, year) VALUES (" +
+        "INSERT INTO instructors(email, course, number, section, year, term) VALUES (" +
           "'" +
           temp1[i] +
           "'" +
@@ -179,13 +187,27 @@ app.post("/departmentSubmission", (req, res) => {
           temp2[i] +
           "'" +
           "," +
-          "'" +
           temp3[i] +
+          "," +
+          "'" +
+          temp4[i] +
           "'" +
           "," +
-          temp4[i]+
+          temp5[i] +
+          "," +
+          "'" +
+          temp6[i] +
+          "'" +
           ");"
       );
+    }
+    for (let i =0; i < temp1.length; i++){
+      subTable = temp1[i];
+      subTable = x.replace(".","");
+      subTable = x.replace("@","");
+      db.any("create table if not exists " + subTable + " (id serial primary key, coursename varchar, timestamp varchar, message varchar)").then(() => {
+        db.any("insert into " + subTable + "");
+      });
     }
   });
 });
@@ -270,6 +292,11 @@ app.post("/courseData", (req, res) => {
         }
       }
       let dbName = "f21_sysc4101_a";
+      let tname = "";
+      let coursname = "";
+      let message = "";
+      db.any("update " + tname + "set timestamp='" + Date.now() + "' where coursename='" + coursname + "';");
+      db.any("update " + tname + "set message='" + message + "' where coursename='" + coursname + "';");
       db.any("Delete from " + dbName)
         .then(() => {
           let query = "INSERT INTO " + dbName + " (";
