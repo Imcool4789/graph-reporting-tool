@@ -44,9 +44,19 @@ export default class AdminFileChooser extends React.Component {
   }
 
   showGA() {
-    var x = document.getElementById("Ga").value;
-    x = x.replace(".", "_");
-    x = "_" + x;
+    console.log("sadsd");
+    var x = document.querySelector('input[name="GAS"]:checked').value;
+    
+  //  var x = document.getElementById("Ga").value;
+ //   if(x.includes(".")){
+  //    x = x.replace(".", "_");
+  //    x = "_" + x;
+  //    
+  //  } else{
+  //    x = "_" + x + "_";
+  //  }
+    x = "_" + x + "_";
+    
     let obj = {};
     obj["GA"] = x;
     let c = "[" + JSON.stringify(obj) + "]";
@@ -350,6 +360,31 @@ export default class AdminFileChooser extends React.Component {
         <button onClick={this.showGA} id="gaButton">
           Search
         </button>
+        <br />
+        <input type="radio" id="GA1" name="GAS" value="GAS"/>
+        <label for="html">GA 1</label><br></br>
+        <input type="radio" id="GA2" name="GAS" value="2"/>
+        <label for="html">GA 2</label><br></br>
+        <input type="radio" id="GA3" name="GAS" value="3"/>
+        <label for="html">GA 3</label><br></br>
+        <input type="radio" id="GA4" name="GAS" value="4"/>
+        <label for="html">GA 4</label><br></br>
+        <input type="radio" id="GA5" name="GAS" value="5"/>
+        <label for="html">GA 5</label><br></br>
+        <input type="radio" id="GA6" name="GAS" value="6"/>
+        <label for="html">GA 6</label><br></br>
+        <input type="radio" id="GA7" name="GAS" value="7"/>
+        <label for="html">GA 7</label><br></br>
+        <input type="radio" id="GA8" name="GAS" value="8"/>
+        <label for="html">GA 8</label><br></br>
+        <input type="radio" id="GA9" name="GAS" value="9"/>
+        <label for="html">GA 9</label><br></br>
+        <input type="radio" id="GA10" name="GAS" value="10"/>
+        <label for="html">GA 10</label><br></br>
+        <input type="radio" id="GA11" name="GAS" value="11"/>
+        <label for="html">GA 11</label><br></br>
+        <input type="radio" id="GA12" name="GAS" value="12"/>
+        <label for="html">GA 12</label><br></br>
         <br />
         <div id="coursesWithGa"></div>
         <br />

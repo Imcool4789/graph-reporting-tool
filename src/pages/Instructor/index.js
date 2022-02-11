@@ -4,6 +4,7 @@ import InstructorFileChooser from "../../components/FileChooser/Instructor";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
+import InstructorSubmissions from "../../components/FileChooser/Instructor/submissions";
 const Instructor = () => {
   return (
     <div>
@@ -23,6 +24,7 @@ const Instructor = () => {
         </Tab>
         <Tab eventKey="third" title="View Submissions">
           <CenterWrapper>
+          <InstructorSubmissions></InstructorSubmissions>
           </CenterWrapper>
         </Tab>
       </Tabs>
