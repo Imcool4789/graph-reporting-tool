@@ -30,9 +30,8 @@ router.post("/access", (req, res) => {
   let subm = {};
   db.any("select email from secret where uid='" + body.sessionID +"';")
     .then((rows) => {
-       subm["email"] = rows;
-      x = subm['email'];
-      console.log(x);
+       subm = rows[0]["email"];
+      console.log(subm);
     });
 
   db.any(
