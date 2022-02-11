@@ -5,31 +5,29 @@ import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
 import InstructorSubmissions from "../../components/FileChooser/Instructor/submissions";
-const Instructor = () => {
-  return (
-    <div>
-      <NavBar></NavBar>
-      <Tabs defaultActiveKey="first">
-        <Tab eventKey="first" title="SYSC 4101">
-          <CenterWrapper>
-            Enter the correct information for SYSC 4101
-            <InstructorFileChooser></InstructorFileChooser>
-          </CenterWrapper>
-        </Tab>
-        <Tab eventKey="second" title="SYSC 2006">
-          <CenterWrapper>
-            Enter the correct information for SYSC 2006
-            <InstructorFileChooser></InstructorFileChooser>
-          </CenterWrapper>
-        </Tab>
-        <Tab eventKey="third" title="View Submissions">
-          <CenterWrapper>
-          <InstructorSubmissions></InstructorSubmissions>
-          </CenterWrapper>
-        </Tab>
-      </Tabs>
-    </div>
-  );
-};
+class Instructor extends React.Component {
+  render() {
+    return (
+      <div>
+        <NavBar></NavBar>
+        <Tabs>
+        {this.props.instructorData.map((data)=>(
+          <Tab eventKey={data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]} title={data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]}>
+            <CenterWrapper>
+              Enter the correct information for {data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]}
+              <InstructorFileChooser></InstructorFileChooser>
+            </CenterWrapper>
+          </Tab>
+        ))}
+          <Tab eventKey="submissions" title="View Submissions">
+            <CenterWrapper>
+              <InstructorSubmissions></InstructorSubmissions>
+            </CenterWrapper>
+          </Tab>
+        </Tabs>
+      </div>
+    );
+  }
+}
 
 export default Instructor;

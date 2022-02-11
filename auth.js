@@ -28,7 +28,7 @@ router.post("/access", (req, res) => {
   console.log(body.sessionID);
   let roles = {};
   db.any(
-    "select instructors.course,instructors.number,instructors.section from instructors,secret where uid='" +
+    "select instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
       body.sessionID +
       "' and instructors.email=secret.email;"
   ).then((rows) => {

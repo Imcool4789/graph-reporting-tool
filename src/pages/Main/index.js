@@ -1,6 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Home from "../Home";
 import Instructor from "../Instructor";
@@ -14,7 +14,11 @@ class Main extends React.Component {
       instructor: false,
       department: false,
       admin: false,
+      instructorData:[],
+      departmentData:[],
     };
+  }
+ componentDidMount(){
     this.onLoad = this.onLoad.bind(this);
     this.onLoad();
   }
@@ -48,11 +52,13 @@ class Main extends React.Component {
             if (obj["Instructor"].length > 0) {
               this.setState({
                 instructor: true,
+                instructorData: obj["Instructor"],
               });
             }
             if (obj["Department Head"].length > 0) {
               this.setState({
                 department: true,
+                departmentData: obj["Department Head"],
               });
             }
           };
@@ -67,24 +73,15 @@ class Main extends React.Component {
 
   render() {
     return (
-      <Switch>
-        <Route exact path="/" component={Home}></Route>
-        {this.state.instructor ? (
-          <Route exact path="/instructor" component={Instructor}></Route>
-        ) : (
-          <Redirect to="/" />
-        )}
-        {this.state.department ? (
-          <Route exact path="/department" component={Department}></Route>
-        ) : (
-          <Redirect to="/" />
-        )}
-        {this.state.admin ? (
-          <Route exact path="/admin" component={Administrator}></Route>
-        ) : (
-          <Redirect to="/" />
-        )}
-      </Switch>
+      <Routes>
+        <Route exact path="/" element={<Home/>}></Route>
+        {this.state.instructor && 
+          <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData}/>} ></Route>}
+        {this.state.department &&
+          <Route exact path="/department" element={<Department/>}></Route>}
+        {this.state.admin &&
+          <Route exact path="/admin" element={<Administrator/>}></Route>}
+      </Routes>
     );
   }
 }

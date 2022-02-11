@@ -2,7 +2,6 @@ import React from "react";
 import NavBar from "../../components/NavBar";
 import DepartmentFileChooser from "../../components/FileChooser/Department";
 import AdminFileChooser from '../../components/FileChooser/Admin'
-import InstructorSubmissions from "../../components/FileChooser/Instructor/submissions";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
@@ -24,7 +23,6 @@ const Department = () => {
           </CenterWrapper>
         </Tab>
         <Tab eventKey="third" title="View Submitted Courses">
-          <InstructorSubmissions></InstructorSubmissions>
           <CenterWrapper></CenterWrapper>
         </Tab>
       </Tabs>
