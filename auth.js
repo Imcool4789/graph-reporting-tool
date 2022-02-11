@@ -27,6 +27,14 @@ router.post("/access", (req, res) => {
   const body = req.body;
   console.log(body.sessionID);
   let roles = {};
+  let subm = {};
+  db.any("select email from secret where uid='" + body.sessionID +"';")
+    .then((rows) => {
+       subm["email"] = rows;
+      x = subm['email'];
+      console.log(x);
+    });
+
   db.any(
     "select instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
       body.sessionID +
