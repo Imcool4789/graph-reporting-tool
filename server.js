@@ -146,10 +146,11 @@ app.post("/departmentSubmission", (req, res) => {
   var x =
     "CREATE TABLE " +
     "instructors " +
-    "(email VARCHAR PRIMARY KEY, course VARCHAR, section VARCHAR);";
+    "(id serial primary key, email VARCHAR, course VARCHAR, section VARCHAR, year integer);";
   let temp1 = [];
   let temp2 = [];
   let temp3 = [];
+  let temp4 = [];
   for (let i = 0; i < req.body.length; i++) {
     for (let key in req.body[i]) {
       if (key.toLowerCase().includes("email")) {
@@ -161,12 +162,15 @@ app.post("/departmentSubmission", (req, res) => {
       if (key.toLowerCase().includes("section")) {
         temp3.push(req.body[i][key]);
       }
+      if (key.toLowerCase().includes("year")) {
+        temp3.push(req.body[i][key]);
+      }
     }
   }
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
       db.any(
-        "INSERT INTO instructors(email, course, section) VALUES (" +
+        "INSERT INTO instructors(email, course, section, year) VALUES (" +
           "'" +
           temp1[i] +
           "'" +
@@ -178,6 +182,8 @@ app.post("/departmentSubmission", (req, res) => {
           "'" +
           temp3[i] +
           "'" +
+          "," +
+          temp4[i]+
           ");"
       );
     }
