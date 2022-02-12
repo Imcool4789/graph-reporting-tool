@@ -158,27 +158,26 @@ app.post("/departmentSubmission", (req, res) => {
       if (key.toLowerCase().includes("email")) {
         temp1.push(req.body[i][key]);
       }
-      if (key.toLowerCase().includes("course")) {
+      if (key.toLowerCase().includes("term")) {
         temp2.push(req.body[i][key]);
-      }
-      if (key.toLowerCase().includes("number")) {
-        temp2.push(req.body[i][key]);
-      }
-      if (key.toLowerCase().includes("section")) {
-        temp3.push(req.body[i][key]);
       }
       if (key.toLowerCase().includes("year")) {
         temp3.push(req.body[i][key]);
       }
-      if (key.toLowerCase().includes("term")) {
-        temp3.push(req.body[i][key]);
+      if (key.toLowerCase().includes("course")) {
+        temp4.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("number")) {
+        temp5.push(req.body[i][key]);
+      }
+      if (key.toLowerCase().includes("section")) {
+        temp6.push(req.body[i][key]);
       }
     }
   }
-  db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
       db.any(
-        "INSERT INTO instructors(email, course, number, section, year, term) VALUES (" +
+        "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
           "'" +
           temp1[i] +
           "'" +
@@ -200,16 +199,18 @@ app.post("/departmentSubmission", (req, res) => {
           "'" +
           ");"
       );
+      subTable = temp1[i];
+      subTable = subTable.replace(".","");
+      subTable = subTable.replace("@","");
+      db.any("create table if not exists " + subTable + " (id serial primary key, coursename varchar unique, timestamp varchar, message varchar)");
     }
     for (let i =0; i < temp1.length; i++){
-      subTable = temp1[i];
-      subTable = x.replace(".","");
-      subTable = x.replace("@","");
-      db.any("create table if not exists " + subTable + " (id serial primary key, coursename varchar, timestamp varchar, message varchar)").then(() => {
-        db.any("insert into " + subTable + "");
-      });
+      s = temp1[i];
+      s = s.replace(".","");
+      s = s.replace("@","");
+      console.log(subTable+"ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+      db.any("insert into " + s + "(coursename) select concat(term,'_',year,'_',course,'_',number,'_',section,'_') from instructors where email='" + temp1[i] + "' on conflict do nothing;");
     }
-  });
 });
 
 app.post("/adminDepartmentSubmission", (req, res) => {

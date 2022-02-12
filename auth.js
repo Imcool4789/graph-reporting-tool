@@ -23,10 +23,7 @@ router.post("/register", (req, res) => {
     console.error("Error:", error);
   });
 });
-router.post("/access", (req, res) => {
-  const body = req.body;
-  console.log(body.sessionID);
-  let roles = {};
+router.post("/timestamp", (req, res) => {
   let subm = {};
   db.any("select email from secret where uid='" + body.sessionID +"';")
     .then((rows) => {
@@ -39,8 +36,12 @@ router.post("/access", (req, res) => {
         roles["timestamp"] = rows;
       });
     });
-  
+});
 
+router.post("/access", (req, res) => {
+  const body = req.body;
+  console.log(body.sessionID);
+  let roles = {};
   db.any(
     "select instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
       body.sessionID +
