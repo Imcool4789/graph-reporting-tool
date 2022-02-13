@@ -12,9 +12,9 @@ class Instructor extends React.Component {
         <NavBar></NavBar>
         <Tabs>
         {this.props.instructorData.map((data)=>(
-          <Tab eventKey={data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]} title={data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]}>
+          <Tab eventKey={data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]} title={data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]}>
             <CenterWrapper>
-              Enter the correct information for {data["course"].toUpperCase()+" "+data["number"]+" "+data["section"].toUpperCase()+" "+data["year"]}
+              Enter the correct information for {data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]}
               <InstructorFileChooser></InstructorFileChooser>
             </CenterWrapper>
           </Tab>
