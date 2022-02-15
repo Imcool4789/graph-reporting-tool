@@ -16,6 +16,7 @@ class Main extends React.Component {
       admin: false,
       instructorData:[],
       departmentData:[],
+      timeStampData:[],
     };
   }
  componentDidMount(){
@@ -50,9 +51,11 @@ class Main extends React.Component {
               });
             }
             if (obj["Instructor"].length > 0) {
+              console.log(obj["timestamp"])
               this.setState({
                 instructor: true,
                 instructorData: obj["Instructor"],
+                timeStampData: obj["timestamp"],
               });
             }
             if (obj["Department Head"].length > 0) {
@@ -76,7 +79,7 @@ class Main extends React.Component {
       <Routes>
         <Route exact path="/" element={<Home/>}></Route>
         {this.state.instructor && 
-          <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData}/>} ></Route>}
+          <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData} timestampData={this.state.timeStampData}/>} ></Route>}
         {this.state.department &&
           <Route exact path="/department" element={<Department/>}></Route>}
         {this.state.admin &&

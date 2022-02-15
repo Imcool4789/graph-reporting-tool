@@ -11,17 +11,52 @@ class Instructor extends React.Component {
       <div>
         <NavBar></NavBar>
         <Tabs>
-        {this.props.instructorData.map((data)=>(
-          <Tab eventKey={data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]} title={data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]}>
-            <CenterWrapper>
-              Enter the correct information for {data["term"]+"_"+data["year"]+"_"+data["course"]+"_"+data["number"]+"_"+data["section"]}
-              <InstructorFileChooser></InstructorFileChooser>
-            </CenterWrapper>
-          </Tab>
-        ))}
+          {this.props.instructorData.map((data) => (
+            <Tab
+              eventKey={
+                data["term"] +
+                "_" +
+                data["year"] +
+                "_" +
+                data["course"] +
+                "_" +
+                data["number"] +
+                "_" +
+                data["section"]
+              }
+              title={
+                data["term"] +
+                "_" +
+                data["year"] +
+                "_" +
+                data["course"] +
+                "_" +
+                data["number"] +
+                "_" +
+                data["section"]
+              }
+            >
+              <CenterWrapper>
+                Enter the correct information for{" "}
+                {data["term"] +
+                  "_" +
+                  data["year"] +
+                  "_" +
+                  data["course"] +
+                  "_" +
+                  data["number"] +
+                  "_" +
+                  data["section"]}
+                <InstructorFileChooser></InstructorFileChooser>
+              </CenterWrapper>
+            </Tab>
+          ))}
           <Tab eventKey="submissions" title="View Submissions">
             <CenterWrapper>
-              <InstructorSubmissions></InstructorSubmissions>
+              {console.log(this.props.timestampData)}
+              <InstructorSubmissions
+                submissionData={this.props.timestampData}
+              ></InstructorSubmissions>
             </CenterWrapper>
           </Tab>
         </Tabs>

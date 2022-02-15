@@ -127,7 +127,7 @@ export default class DepartmentFileChooser extends React.Component {
   render() {
     return (
       <div>
-        <label for="avatar">Instructor Submission: </label>
+        <label htmlFor="avatar">Instructor Submission: </label>
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
         <br />
         <p id="demo"></p>

@@ -25,29 +25,46 @@ router.post("/register", (req, res) => {
 });
 router.post("/timestamp", (req, res) => {
   let subm = {};
-  db.any("select email from secret where uid='" + body.sessionID +"';")
-    .then((rows) => {
+  db.any("select email from secret where uid='" + body.sessionID + "';").then(
+    (rows) => {
       subm = rows[0]["email"];
-      subm = subm.replace(".","");
-      subm = subm.replace("@","");
+      subm = subm.replace(".", "");
+      subm = subm.replace("@", "");
       console.log(subm);
-      db.any("select coursename,timestamp from " + subm + ";")
-      .then((rows) => {
+      db.any("select coursename,timestamp from " + subm + ";").then((rows) => {
         roles["timestamp"] = rows;
       });
-    });
+    }
+  );
 });
 
 router.post("/access", (req, res) => {
   const body = req.body;
   console.log(body.sessionID);
   let roles = {};
+  let subm = {};
   db.any(
     "select instructors.term,instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
       body.sessionID +
       "' and instructors.email=secret.email;"
   ).then((rows) => {
     roles["Instructor"] = rows;
+    db.any("Select email from secret where uid='" + body.sessionID + "';").then(
+      (rows) => {
+        console.log(rows);
+        if (rows.length > 0) {
+          subm = rows[0]["email"];
+          subm = subm.replace(".", "");
+          subm = subm.replace("@", "");
+          console.log(subm);
+          db.any("select coursename,timestamp from " + subm + ";").then(
+            (rows) => {
+              roles["timestamp"] = rows;
+            }
+          );
+        }
+      }
+    );
     db.any(
       "select dep_name from departments,secret where uid='" +
         body.sessionID +

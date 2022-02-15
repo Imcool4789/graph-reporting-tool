@@ -1,16 +1,17 @@
 import * as XLSX from "xlsx";
 import React from "react";
-import InputGroup from "react-bootstrap/InputGroup";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import Dropdown from "react-bootstrap/Dropdown";
-import FormControl from "react-bootstrap/FormControl";
+import CourseSelection from "./courseSelection";
 
 export default class AdminFileChooser extends React.Component {
   constructor(props) {
     super(props);
     this.s = [];
-    this.state = { excelData: {} };
-    
+    this.state = {
+      excelData: {},
+      id: 0,
+      courseSelection: [],
+    };
+    this.addCourse();
   }
 
   excelToJson(reader) {
@@ -46,17 +47,17 @@ export default class AdminFileChooser extends React.Component {
   showGA() {
     console.log("sadsd");
     var x = document.querySelector('input[name="GAS"]:checked').value;
-    
-  //  var x = document.getElementById("Ga").value;
- //   if(x.includes(".")){
-  //    x = x.replace(".", "_");
-  //    x = "_" + x;
-  //    
-  //  } else{
-  //    x = "_" + x + "_";
-  //  }
+
+    //  var x = document.getElementById("Ga").value;
+    //   if(x.includes(".")){
+    //    x = x.replace(".", "_");
+    //    x = "_" + x;
+    //
+    //  } else{
+    //    x = "_" + x + "_";
+    //  }
     x = "_" + x + "_";
-    
+
     let obj = {};
     obj["GA"] = x;
     let c = "[" + JSON.stringify(obj) + "]";
@@ -321,11 +322,47 @@ export default class AdminFileChooser extends React.Component {
         console.error("Error:", error);
       });
   }
-
+  addCourse() {
+    let currState = this.state.courseSelection;
+    currState.push(<CourseSelection id={this.state.id}></CourseSelection>);
+    let newId = this.state.id + 1;
+    this.setState({
+      courseSelection: currState,
+      id: newId,
+    });
+    //let parent = document.getElementById("courseSelection");
+    //parent.appendChild(<CourseSelection id={this.state.id}></CourseSelection>);
+  }
   render() {
     return (
       <div>
         <label htmlFor="1">Course Submission: </label>
+        <br />
+        <label htmlFor="2">Select Term: </label>
+        <select name="term" id="2">
+          <option value="Summer">Summer</option>
+          <option value="Fall">Fall</option>
+          <option value="Winter">Winter</option>
+        </select>
+        <br />
+        <label htmlFor="3">Select Year: </label>
+        <select name="year" id="3">
+          <option value="2022">2022</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+        </select>
+        <br />
+        <label htmlFor="4">Select Section: </label>
+        <select name="section" id="4">
+          <option value="a">a</option>
+          <option value="b">b</option>
+          <option value="c">c</option>
+          <option value="d">d</option>
+          <option value="e">e</option>
+          <option value="f">f</option>
+          <option value="g">g</option>
+        </select>
+        <br />
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
         <br />
         <br />
@@ -361,30 +398,42 @@ export default class AdminFileChooser extends React.Component {
           Search
         </button>
         <br />
-        <input type="radio" id="GA1" name="GAS" value="GAS"/>
-        <label for="html">GA 1</label><br></br>
-        <input type="radio" id="GA2" name="GAS" value="2"/>
-        <label for="html">GA 2</label><br></br>
-        <input type="radio" id="GA3" name="GAS" value="3"/>
-        <label for="html">GA 3</label><br></br>
-        <input type="radio" id="GA4" name="GAS" value="4"/>
-        <label for="html">GA 4</label><br></br>
-        <input type="radio" id="GA5" name="GAS" value="5"/>
-        <label for="html">GA 5</label><br></br>
-        <input type="radio" id="GA6" name="GAS" value="6"/>
-        <label for="html">GA 6</label><br></br>
-        <input type="radio" id="GA7" name="GAS" value="7"/>
-        <label for="html">GA 7</label><br></br>
-        <input type="radio" id="GA8" name="GAS" value="8"/>
-        <label for="html">GA 8</label><br></br>
-        <input type="radio" id="GA9" name="GAS" value="9"/>
-        <label for="html">GA 9</label><br></br>
-        <input type="radio" id="GA10" name="GAS" value="10"/>
-        <label for="html">GA 10</label><br></br>
-        <input type="radio" id="GA11" name="GAS" value="11"/>
-        <label for="html">GA 11</label><br></br>
-        <input type="radio" id="GA12" name="GAS" value="12"/>
-        <label for="html">GA 12</label><br></br>
+        <input type="radio" id="GA1" name="GAS" value="GAS" /> {" "}
+        <label htmlFor="html">GA 1</label>
+        <br></br>
+        <input type="radio" id="GA2" name="GAS" value="2" /> {" "}
+        <label htmlFor="html">GA 2</label>
+        <br></br>
+        <input type="radio" id="GA3" name="GAS" value="3" /> {" "}
+        <label htmlFor="html">GA 3</label>
+        <br></br>
+        <input type="radio" id="GA4" name="GAS" value="4" /> {" "}
+        <label htmlFor="html">GA 4</label>
+        <br></br>
+        <input type="radio" id="GA5" name="GAS" value="5" /> {" "}
+        <label htmlFor="html">GA 5</label>
+        <br></br>
+        <input type="radio" id="GA6" name="GAS" value="6" /> {" "}
+        <label htmlFor="html">GA 6</label>
+        <br></br>
+        <input type="radio" id="GA7" name="GAS" value="7" /> {" "}
+        <label htmlFor="html">GA 7</label>
+        <br></br>
+        <input type="radio" id="GA8" name="GAS" value="8" /> {" "}
+        <label htmlFor="html">GA 8</label>
+        <br></br>
+        <input type="radio" id="GA9" name="GAS" value="9" /> {" "}
+        <label htmlFor="html">GA 9</label>
+        <br></br>
+        <input type="radio" id="GA10" name="GAS" value="10" /> {" "}
+        <label htmlFor="html">GA 10</label>
+        <br></br>
+        <input type="radio" id="GA11" name="GAS" value="11" /> {" "}
+        <label htmlFor="html">GA 11</label>
+        <br></br>
+        <input type="radio" id="GA12" name="GAS" value="12" /> {" "}
+        <label htmlFor="html">GA 12</label>
+        <br></br>
         <br />
         <div id="coursesWithGa"></div>
         <br />
@@ -397,45 +446,8 @@ export default class AdminFileChooser extends React.Component {
         </button>
         <br />
         <div id="program"></div>
-        <InputGroup className="mb-3">
-          <DropdownButton
-            variant="outline-secondary"
-            title="Select Course Code"
-            id="input-group-dropdown-1"
-            //onSelect={this.handleSelect}
-          >
-            <Dropdown.Item eventKey="option-1">Action</Dropdown.Item>
-            <Dropdown.Item eventKey="option-2">Another action</Dropdown.Item>
-            <Dropdown.Item eventKey="option-3">
-              Something else here
-            </Dropdown.Item>
-          </DropdownButton>
-          <FormControl disabled="true" />
-          <DropdownButton
-            variant="outline-secondary"
-            title="Select Year offered"
-            id="input-group-dropdown-2"
-            align="middle"
-          >
-            <Dropdown.Item href="#">Action</Dropdown.Item>
-            <Dropdown.Item href="#">Another action</Dropdown.Item>
-            <Dropdown.Item href="#">Something else here</Dropdown.Item>
-          </DropdownButton>
-          <FormControl disabled="true" />
-          <DropdownButton
-            variant="outline-secondary"
-            title="Select Term and Section"
-            id="input-group-dropdown-3"
-            align="end"
-          >
-            <Dropdown.Item href="#">Action</Dropdown.Item>
-            <Dropdown.Item href="#">Another action</Dropdown.Item>
-            <Dropdown.Item href="#">Something else here</Dropdown.Item>
-          </DropdownButton>
-        </InputGroup>
-        <button>
-          Add additional course
-        </button>
+        <div id="courseSelection">{this.state.courseSelection}</div>
+        <button onClick={() => this.addCourse()}>Add additional course</button>
       </div>
     );
   }
