@@ -17,6 +17,7 @@ class Main extends React.Component {
       instructorData:[],
       departmentData:[],
       timeStampData:[],
+      table:[],
     };
   }
  componentDidMount(){
@@ -44,18 +45,17 @@ class Main extends React.Component {
         .then((response) => {
           const getResponse = async () => {
             const obj = await response.json();
-            console.log(obj);
             if (obj["Admin"].length > 0) {
               this.setState({
                 admin: true,
               });
             }
             if (obj["Instructor"].length > 0) {
-              console.log(obj["timestamp"])
               this.setState({
                 instructor: true,
                 instructorData: obj["Instructor"],
                 timeStampData: obj["timestamp"],
+                table:obj["table"],
               });
             }
             if (obj["Department Head"].length > 0) {
@@ -79,7 +79,7 @@ class Main extends React.Component {
       <Routes>
         <Route exact path="/" element={<Home/>}></Route>
         {this.state.instructor && 
-          <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData} timestampData={this.state.timeStampData}/>} ></Route>}
+          <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData} timestampData={this.state.timeStampData} table={this.state.table}/>} ></Route>}
         {this.state.department &&
           <Route exact path="/department" element={<Department/>}></Route>}
         {this.state.admin &&

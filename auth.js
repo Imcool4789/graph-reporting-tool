@@ -30,7 +30,6 @@ router.post("/timestamp", (req, res) => {
       subm = rows[0]["email"];
       subm = subm.replace(".", "");
       subm = subm.replace("@", "");
-      console.log(subm);
       db.any("select coursename,timestamp from " + subm + ";").then((rows) => {
         roles["timestamp"] = rows;
       });
@@ -40,7 +39,6 @@ router.post("/timestamp", (req, res) => {
 
 router.post("/access", (req, res) => {
   const body = req.body;
-  console.log(body.sessionID);
   let roles = {};
   let subm = {};
   db.any(
@@ -51,15 +49,14 @@ router.post("/access", (req, res) => {
     roles["Instructor"] = rows;
     db.any("Select email from secret where uid='" + body.sessionID + "';").then(
       (rows) => {
-        console.log(rows);
         if (rows.length > 0) {
           subm = rows[0]["email"];
           subm = subm.replace(".", "");
           subm = subm.replace("@", "");
-          console.log(subm);
           db.any("select coursename,timestamp from " + subm + ";").then(
             (rows) => {
               roles["timestamp"] = rows;
+              roles["table"] = subm;
             }
           );
         }
@@ -88,7 +85,6 @@ router.post("/access", (req, res) => {
 });
 router.post("/compare", (req, res) => {
   const body = req.body;
-  console.log(req.body);
   db.any("SELECT hash from secret where email ='" + body.email + "';")
     .then((rows) => {
       if (rows.length > 0) {
@@ -104,9 +100,6 @@ router.post("/compare", (req, res) => {
           res.cookie("sessionID", req.sessionID);
           res.sendStatus(200);
         } else {
-          console.log(
-            "The username or password that you have entered is wrong"
-          );
           res.sendStatus(403);
         }
       } else {

@@ -20,13 +20,11 @@ class NavBar extends React.Component {
   }
   render() {
     return (
-      <>
         <Nav>
           <NavBarContainer>
             <NavMenu>{this.state.navItems}</NavMenu>
           </NavBarContainer>
         </Nav>
-      </>
     );
   }
   navLoad() {
@@ -36,7 +34,6 @@ class NavBar extends React.Component {
         sessionID: Cookies.get("sessionID"),
       });
       let data1 = [data];
-      console.log(data1);
       fetch(
         process.env.NODE_ENV === "production"
           ? "https://graphing-report-tool.herokuapp.com/auth/access"
@@ -55,21 +52,21 @@ class NavBar extends React.Component {
             if (obj["Admin"].length > 0) {
               nav.push(
                 <NavItem>
-                  <NavLinks to="/admin">Administrator</NavLinks>
+                  <NavLinks key="admin" to="/admin">Administrator</NavLinks>
                 </NavItem>
               );
             }
             if (obj["Instructor"].length > 0) {
               nav.push(
                 <NavItem>
-                  <NavLinks to="/instructor">Instructor</NavLinks>
+                  <NavLinks key="instructor" to="/instructor">Instructor</NavLinks>
                 </NavItem>
               );
             }
             if (obj["Department Head"].length > 0) {
               nav.push(
               <NavItem>
-                <NavLinks to="/department">Department</NavLinks>
+                <NavLinks key="department" to="/department">Department</NavLinks>
               </NavItem>
               );
             }
