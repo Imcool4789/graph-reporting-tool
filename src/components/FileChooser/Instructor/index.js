@@ -224,6 +224,27 @@ export default class InstructorFileChooser extends React.Component {
     }
     return dataBins;
   }
+  sendMessage() {
+    let data={};
+    data["message"]=document.getElementById("Message").value;
+    data["table"]=this.props.table;
+    data["course"]=this.props.course;
+    let bod=JSON.stringify(data);
+    fetch(
+      process.env.NODE_ENV === "production"
+        ? "https://graphing-report-tool.herokuapp.com/sendMessage"
+        : "http://localhost:5000/sendMessage",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: bod,
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   convertToPdf() {
     let chart = window.document.getElementById("myChart");
     html2canvas(chart).then((canvas) => {
@@ -249,6 +270,7 @@ export default class InstructorFileChooser extends React.Component {
     let r = window.confirm("Are you sure you wish to upload this spreadsheet?");
     if (r) {
       this.grabData();
+      this.sendMessage();
     }
   }
   render() {
@@ -278,8 +300,7 @@ export default class InstructorFileChooser extends React.Component {
             style={{ margin: "10px" }}
           />
           <label htmlFor="agree">
-            {" "}
-            I acknowledge that any previous existing data will be{" "}
+            I acknowledge that any previous existing data will be
             <b>removed and replaced</b> with the new uploaded data.
           </label>
         </div>

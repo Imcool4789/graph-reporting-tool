@@ -11,6 +11,7 @@ class Instructor extends React.Component {
     this.state = {
       instructorData: [],
       instructorBody: [],
+      timestampData:[],
     };
   }
   componentDidMount() {
@@ -31,6 +32,7 @@ class Instructor extends React.Component {
     }
     this.setState({
       instructorData: instructorData,
+      timestampData:this.props.timestampData
     });
   }
   render() {
@@ -50,7 +52,7 @@ class Instructor extends React.Component {
           <Tab eventKey="submissions" title="View Submissions">
             <CenterWrapper>
               <InstructorSubmissions
-                submissionData={this.props.timestampData}
+                submissionData={this.state.timestampData}
               ></InstructorSubmissions>
             </CenterWrapper>
           </Tab>
