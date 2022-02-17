@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 import React from "react";
-export default class DepartmentFileChooser extends React.Component {
+export default class DepartmentInstructorSubmission extends React.Component {
   constructor(props) {
     super(props);
     this.s = [];

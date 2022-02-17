@@ -225,11 +225,11 @@ export default class InstructorFileChooser extends React.Component {
     return dataBins;
   }
   sendMessage() {
-    let data={};
-    data["message"]=document.getElementById("Message").value;
-    data["table"]=this.props.table;
-    data["course"]=this.props.course;
-    let bod=JSON.stringify(data);
+    let data = {};
+    data["message"] = document.getElementById("Message").value;
+    data["table"] = this.props.table;
+    data["course"] = this.props.course;
+    let bod = JSON.stringify(data);
     fetch(
       process.env.NODE_ENV === "production"
         ? "https://graphing-report-tool.herokuapp.com/sendMessage"
@@ -240,10 +240,10 @@ export default class InstructorFileChooser extends React.Component {
           "Content-Type": "application/json",
         },
         body: bod,
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      }
+    ).catch((error) => {
+      console.log(error);
+    });
   }
   convertToPdf() {
     let chart = window.document.getElementById("myChart");

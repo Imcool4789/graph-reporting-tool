@@ -1,10 +1,10 @@
 import React from "react";
 import NavBar from "../../components/NavBar";
-import DepartmentFileChooser from "../../components/FileChooser/Department";
-import AdminFileChooser from '../../components/FileChooser/Admin'
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
+import DepartmentFileChooser from "../../components/FileChooser/Department/departmentFileChooser";
+import DepartmentInstructorSubmission from "../../components/FileChooser/Department";
 const Department = () => {
   return (
     <div>
@@ -13,13 +13,12 @@ const Department = () => {
         <Tab eventKey="first" title="Instructor Submission">
           <CenterWrapper>
             Enter the required information to populate course instructors.
-            <DepartmentFileChooser></DepartmentFileChooser>
+            <DepartmentInstructorSubmission></DepartmentInstructorSubmission>
           </CenterWrapper>
         </Tab>
         <Tab eventKey="second" title="Report Generation">
           <CenterWrapper>
-            Select the options to generate a report.
-            <AdminFileChooser></AdminFileChooser>
+            <DepartmentFileChooser></DepartmentFileChooser>
           </CenterWrapper>
         </Tab>
         <Tab eventKey="third" title="View Submitted Courses">

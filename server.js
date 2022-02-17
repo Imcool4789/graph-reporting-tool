@@ -8,8 +8,6 @@ app.post("/sendMessage", (req, res) => {
   let tname = req.body.table;
   let courseName = req.body.course;
   let message = req.body.message;
-  console.log(req.body)
-  console.log("update " + tname + " set timestamp='" + Date.now() + "' where coursename='" + courseName + "';");
   db.any("update " + tname + " set timestamp='" + Date.now() + "' where coursename='" + courseName + "';").catch((error) => {
     console.log(error);
   });;
