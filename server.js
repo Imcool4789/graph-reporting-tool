@@ -27,7 +27,16 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
-  console.log(req.body);
+  console.log(req.body["GA"]);
+  var x = "select table_name from information_schema.columns where column_name ~" + "'_" + req.body["GA"] + "_';";
+  console.log(x);
+  db.any(x
+  ).then((table_name) => {
+    res.json(table_name);
+  })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 app.post("/adminGA", (req, res) => {
   let temp = [];
@@ -209,7 +218,6 @@ app.post("/departmentSubmission", (req, res) => {
       s = temp1[i];
       s = s.replace(".","");
       s = s.replace("@","");
-      console.log(subTable+"ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
       db.any("insert into " + s + "(coursename) select concat(term,'_',year,'_',course,'_',number,'_',section,'_') from instructors where email='" + temp1[i] + "' on conflict do nothing;");
     }
 });

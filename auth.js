@@ -45,10 +45,10 @@ router.post("/access", (req, res) => {
   db.any("create table if not exists instructors (id serial primary key, email varchar, course varchar, number integer, section varchar, year integer, term varchar);"
   ).then(() => {
     db.any("create table if not exists departments (email VARCHAR PRIMARY KEY, dep_name VARCHAR);"
-
+      
     ).then(() => {
       db.any(
-        "select instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
+        "select instructor.term,instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
           body.sessionID +
           "' and instructors.email=secret.email;"
       ).then((rows) => {
