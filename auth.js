@@ -25,27 +25,39 @@ router.post("/register", (req, res) => {
 });
 router.post("/timestamp", (req, res) => {
   let subm = {};
-  db.any("select email from secret where uid='" + body.sessionID +"';")
-    .then((rows) => {
+  db.any("select email from secret where uid='" + body.sessionID + "';").then(
+    (rows) => {
       subm = rows[0]["email"];
-      subm = subm.replace(".","");
-      subm = subm.replace("@","");
-      console.log(subm);
-      db.any("select coursename,timestamp from " + subm + ";")
-      .then((rows) => {
-        roles["timestamp"] = rows;
+      subm = subm.replace(".", "");
+      subm = subm.replace("@", "");
+      db.any(
+        "create table if not exists " +
+          subm +
+          " (id serial primary key, coursename varchar, timestamp varchar, message varchar)"
+      ).then(() => {
+        subm = rows[0]["email"];
+        subm = subm.replace(".", "");
+        subm = subm.replace("@", "");
+        console.log(subm);
+        db.any("select coursename,timestamp from " + subm + ";").then(
+          (rows) => {
+            roles["timestamp"] = rows;
+          }
+        );
       });
-    });
+    }
+  );
 });
 
 router.post("/access", (req, res) => {
   const body = req.body;
   console.log(body.sessionID);
   let roles = {};
-  db.any("create table if not exists instructors (id serial primary key, email varchar, course varchar, number integer, section varchar, year integer, term varchar);"
+  db.any(
+    "create table if not exists instructors (id serial primary key, email varchar, course varchar, number integer, section varchar, year integer, term varchar);"
   ).then(() => {
-    db.any("create table if not exists departments (email VARCHAR PRIMARY KEY, dep_name VARCHAR);"
-
+    db.any(
+      "create table if not exists departments (email VARCHAR PRIMARY KEY, dep_name VARCHAR);"
     ).then(() => {
       db.any(
         "select instructors.term,instructors.course,instructors.number,instructors.section,instructors.year from instructors,secret where uid='" +
@@ -66,6 +78,26 @@ router.post("/access", (req, res) => {
           )
             .then((rows) => {
               roles["Admin"] = rows;
+              db.any(
+                "select email from secret where uid='" + body.sessionID + "';"
+              ).then((rows) => {
+                subm = rows[0]["email"];
+                subm = subm.replace(".", "");
+                subm = subm.replace("@", "");
+                console.log(subm);
+                db.any(
+                  "create table if not exists " +
+                    subm +
+                    " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
+                ).then(() => {
+                  db.any("select coursename,timestamp from " + subm + ";").then(
+                    (rows) => {
+                      roles["Timestamp"] = rows;
+                      console.log(roles);
+                    }
+                  );
+                });
+              });
             })
             .then(() => {
               console.log(roles);

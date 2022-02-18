@@ -4,14 +4,14 @@ const app = connect.app;
 const PORT = connect.PORT;
 const loginRoutes = require("./auth");
 const session = require("express-session");
-const uuid =require("uuid");
+const uuid = require("uuid");
 app.use(
   session({
     secret: "secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 8604000 },
-    genid:function(req){
+    genid: function (req) {
       return uuid.v4();
     },
   })
@@ -28,13 +28,17 @@ app.get("/test", (req, res) => {
 });
 app.post("/queryGA", (req, res) => {
   console.log(req.body["GA"]);
-  var x = "select table_name from information_schema.columns where column_name ~" + "'_" + req.body["GA"] + "_';";
+  var x =
+    "select table_name from information_schema.columns where column_name ~" +
+    "'_" +
+    req.body["GA"] +
+    "_';";
   console.log(x);
-  db.any(x
-  ).then((table_name) => {
-    console.log(table_name);
-    res.json(table_name);
-  })
+  db.any(x)
+    .then((table_name) => {
+      console.log(table_name);
+      res.json(table_name);
+    })
     .catch((error) => {
       console.log(error);
     });
@@ -92,7 +96,16 @@ app.post("/adminShowYear", (req, res) => {
 app.post("/sendMessage", (req, res) => {
   const body = req.body;
   console.log(body);
-  db.any("update message set note="+ "'" + body + "'" +" where course="+ "'" +"f21_sysc4101_a"+"';");
+  db.any(
+    "update message set note=" +
+      "'" +
+      body +
+      "'" +
+      " where course=" +
+      "'" +
+      "f21_sysc4101_a" +
+      "';"
+  );
 });
 
 app.post("/adminShowYearCourses", (req, res) => {
@@ -186,41 +199,65 @@ app.post("/departmentSubmission", (req, res) => {
       }
     }
   }
-    for (let i = 0; i < temp1.length; i++) {
-      db.any(
-        "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
-          "'" +
-          temp1[i] +
-          "'" +
-          "," +
-          "'" +
-          temp2[i] +
-          "'" +
-          "," +
-          temp3[i] +
-          "," +
-          "'" +
-          temp4[i] +
-          "'" +
-          "," +
-          temp5[i] +
-          "," +
-          "'" +
-          temp6[i] +
-          "'" +
-          ");"
-      );
-      subTable = temp1[i];
-      subTable = subTable.replace(".","");
-      subTable = subTable.replace("@","");
-      db.any("create table if not exists " + subTable + " (id serial primary key, coursename varchar unique, timestamp varchar, message varchar)");
-    }
-    for (let i =0; i < temp1.length; i++){
-      s = temp1[i];
-      s = s.replace(".","");
-      s = s.replace("@","");
-      db.any("insert into " + s + "(coursename) select concat(term,'_',year,'_',course,'_',number,'_',section,'_') from instructors where email='" + temp1[i] + "' on conflict do nothing;");
-    }
+  db.any("drop table instructors;").then(() => {
+    db.any(
+      "create table if not exists instructors (id serial primary key, email varchar, course varchar, number integer, section varchar, year integer, term varchar);"
+    ).then(() => {
+      for (let i = 0; i < temp1.length; i++) {
+        db.any(
+          "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
+            "'" +
+            temp1[i] +
+            "'" +
+            "," +
+            "'" +
+            temp2[i] +
+            "'" +
+            "," +
+            temp3[i] +
+            "," +
+            "'" +
+            temp4[i] +
+            "'" +
+            "," +
+            temp5[i] +
+            "," +
+            "'" +
+            temp6[i] +
+            "'" +
+            ");"
+        )
+          .then(() => {
+            subTable = temp1[i];
+            subTable = subTable.replace(".", "");
+            subTable = subTable.replace("@", "");
+            db.any(
+              "create table if not exists " +
+                subTable +
+                " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
+            );
+          })
+          .then(() => {
+            if (i == temp1.length - 1) {
+              let unique = [...new Set(temp1)];
+              for (let j = 0; j < unique.length; j++) {
+                subTable = unique[j];
+                subTable = subTable.replace(".", "");
+                subTable = subTable.replace("@", "");
+                console.log(subTable + " , " + unique[j] + " , " + j);
+                db.any(
+                  "insert into " +
+                    subTable +
+                    "(coursename) select concat('_',term,'_',year,'_',course,'_',number,'_',section,'_') from instructors where email='" +
+                    unique[j] +
+                    "' on conflict do nothing;"
+                );
+              }
+            }
+          });
+      }
+    });
+  });
 });
 
 app.post("/adminDepartmentSubmission", (req, res) => {
@@ -278,19 +315,34 @@ app.post("/adminSubmission", (req, res) => {
       } else if (key.toLowerCase().includes("section")) {
         section.push(req.body[i][key]);
       } else if (key.toLowerCase().includes("ga")) {
-        key = key.replace(".","_");
         temp.push(req.body[i][key]);
       }
     }
   }
 
-  for(let i = 0; i < term.length;i++){
-    name[i] = "_" + term[i] + "_" + year[0] + "_" + course[0] + "_" + number[0] + "_" + section[i] + "_";
-    console.log(name[i]);  
+  for (let i = 0; i < temp.length; i++) {
+    temp[i] = temo[i].replace(".", "_");
+    console.log(temp[i]);
   }
 
-  for(let i = 0; i < name.length; i++){
-    db.any
+  for (let i = 0; i < term.length; i++) {
+    name[i] =
+      "_" +
+      term[i] +
+      "_" +
+      year[0] +
+      "_" +
+      course[0] +
+      "_" +
+      number[0] +
+      "_" +
+      section[i] +
+      "_";
+    console.log(name[i]);
+  }
+
+  for (let i = 0; i < name.length; i++) {
+    db.any;
   }
 
   console.log(temp.toString());
@@ -328,8 +380,24 @@ app.post("/courseData", (req, res) => {
       let tname = "";
       let coursname = "";
       let message = "";
-      db.any("update " + tname + "set timestamp='" + Date.now() + "' where coursename='" + coursname + "';");
-      db.any("update " + tname + "set message='" + message + "' where coursename='" + coursname + "';");
+      db.any(
+        "update " +
+          tname +
+          "set timestamp='" +
+          Date.now() +
+          "' where coursename='" +
+          coursname +
+          "';"
+      );
+      db.any(
+        "update " +
+          tname +
+          "set message='" +
+          message +
+          "' where coursename='" +
+          coursname +
+          "';"
+      );
       db.any("Delete from " + dbName)
         .then(() => {
           let query = "INSERT INTO " + dbName + " (";
