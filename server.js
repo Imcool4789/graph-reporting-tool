@@ -27,15 +27,12 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
-<<<<<<< HEAD
   console.log(req.body["GA"]);
   var x = "select table_name from information_schema.columns where column_name ~" + "'_" + req.body["GA"] + "_';";
-=======
-  var x = "select table_name from information_schema.columns where columnname ~" + "'" + req.body["GA"] + "_';";
->>>>>>> cf83cb50a2cea09e37652f09f97243488d1095ba
   console.log(x);
   db.any(x
   ).then((table_name) => {
+    console.log(table_name);
     res.json(table_name);
   })
     .catch((error) => {
@@ -366,15 +363,6 @@ app.post("/courseData", (req, res) => {
           console.log(error);
         });
       res.send(req.body);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
-app.get("/testData", (req, res) => {
-  db.any("SELECT * from f21_sysc4101_a;")
-    .then((rows) => {
-      res.json(rows);
     })
     .catch((error) => {
       console.log(error);
