@@ -3,8 +3,8 @@ import NavBar from "../../components/NavBar";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
-import DepartmentFileChooser from "../../components/FileChooser/Department/departmentFileChooser";
 import DepartmentInstructorSubmission from "../../components/FileChooser/Department";
+import ReportGeneration from "../../components/ReportGeneration/reportGeneration";
 const Department = () => {
   return (
     <div>
@@ -18,7 +18,7 @@ const Department = () => {
         </Tab>
         <Tab eventKey="second" title="Report Generation">
           <CenterWrapper>
-            <DepartmentFileChooser></DepartmentFileChooser>
+            <ReportGeneration></ReportGeneration>
           </CenterWrapper>
         </Tab>
         <Tab eventKey="third" title="View Submitted Courses">
