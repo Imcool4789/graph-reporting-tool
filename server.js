@@ -27,8 +27,12 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
+<<<<<<< HEAD
   console.log(req.body["GA"]);
   var x = "select table_name from information_schema.columns where column_name ~" + "'_" + req.body["GA"] + "_';";
+=======
+  var x = "select table_name from information_schema.columns where columnname ~" + "'" + req.body["GA"] + "_';";
+>>>>>>> cf83cb50a2cea09e37652f09f97243488d1095ba
   console.log(x);
   db.any(x
   ).then((table_name) => {
