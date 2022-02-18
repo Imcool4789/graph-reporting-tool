@@ -27,7 +27,15 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
-  console.log(req.body);
+  var x = "select table_name from information_schema.columns where columnname ~" + "'" + req.body["GA"] + "_';";
+  console.log(x);
+  db.any(x
+  ).then((table_name) => {
+    res.json(table_name);
+  })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 app.post("/adminGA", (req, res) => {
   let temp = [];
