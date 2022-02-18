@@ -7,15 +7,17 @@ export default class ReportGeneration extends React.Component {
       id: 0,
     };
     this.addCourse = this.addCourse.bind(this);
-    this.componentDidMount=this.componentDidMount.bind(this);
-    this.addCourse=this.addCourse.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
+    this.addCourse = this.addCourse.bind(this);
   }
   componentDidMount() {
     let radio = document.getElementById("radio");
     for (let i = 1; i <= 12; i++) {
       let input = document.createElement("input");
       input.type = "radio";
+      input.name = "GARad";
       input.id = " GA " + i;
+      input.value = i;
       radio.appendChild(input);
       let label = document.createElement("label");
       label.htmlFor = " GA " + i;
@@ -24,7 +26,31 @@ export default class ReportGeneration extends React.Component {
       radio.appendChild(document.createElement("br"));
     }
     let button = document.createElement("button");
+    button.id = "GAButton";
     button.innerHTML = "Confirm GA";
+    button.onclick = function () {
+      let ga = JSON.stringify({
+        GA: document.querySelector('input[name="GARad"]:checked').value,
+      });
+      fetch(
+        process.env.NODE_ENV === "production"
+          ? "https://graphing-report-tool.herokuapp.com/queryGA"
+          : "/queryGA",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: ga,
+        }
+      )
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    };
     radio.appendChild(button);
     let courseSelection = document.getElementById("courseSelection");
     let div = document.createElement("div");
@@ -42,7 +68,7 @@ export default class ReportGeneration extends React.Component {
     let but = document.createElement("button");
     but.id = "button" + this.state.id;
     but.innerHTML = "Remove Course";
-    let i=this.state.id;
+    let i = this.state.id;
     but.onclick = function () {
       let div = document.getElementById("selection" + i);
       div.remove();
@@ -121,7 +147,7 @@ export default class ReportGeneration extends React.Component {
     let but = document.createElement("button");
     but.id = "button" + this.state.id;
     but.innerHTML = "Remove Course";
-    let i=this.state.id;
+    let i = this.state.id;
     but.onclick = function () {
       let div = document.getElementById("selection" + i);
       div.remove();

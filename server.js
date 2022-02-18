@@ -26,6 +26,9 @@ app.get("/test", (req, res) => {
       console.log(error);
     });
 });
+app.post("/queryGA", (req, res) => {
+  console.log(req.body);
+});
 app.post("/adminGA", (req, res) => {
   let temp = [];
   for (let i = 0; i < req.body.length; i++) {
