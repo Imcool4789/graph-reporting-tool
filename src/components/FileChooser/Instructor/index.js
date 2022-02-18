@@ -286,7 +286,7 @@ export default class InstructorFileChooser extends React.Component {
         <div style={{ margin: "10px" }}>Add a Message: </div>
         <textarea
           id="Message"
-          name="Messahe"
+          name="Message"
           rows="8"
           cols="70"
           style={{ margin: "10px" }}
@@ -300,7 +300,7 @@ export default class InstructorFileChooser extends React.Component {
             style={{ margin: "10px" }}
           />
           <label htmlFor="agree">
-            I acknowledge that any previous existing data will be
+            I acknowledge that any previous existing data will be {}
             <b>removed and replaced</b> with the new uploaded data.
           </label>
         </div>

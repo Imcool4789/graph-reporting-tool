@@ -1,6 +1,17 @@
 import React from "react";
 
 export default class InstructorSubmissions extends React.Component {
+  constructor(){
+    super();
+    this.state={
+      submissionData:[]
+    }
+  }
+  componentDidMount(){
+    this.setState({
+      submissionData:this.props.submissionData
+    })
+  }
   render() {
     return (
       <div>
@@ -10,7 +21,7 @@ export default class InstructorSubmissions extends React.Component {
             <th>Course</th>
             <th>Date Submitted</th>
           </tr>
-          {this.props.submissionData.map((data) => (
+          {this.state.submissionData.map((data) => (
             <tr>
               <td>{data["coursename"]}</td>
               <td>
