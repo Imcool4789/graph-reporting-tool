@@ -437,6 +437,10 @@ app.post("/courseData", (req, res) => {
     });
 });
 
+app.post("/courseSubmission", (req, res) => {
+  console.log(req.body);
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
 });
