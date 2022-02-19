@@ -342,7 +342,16 @@ app.post("/adminSubmission", (req, res) => {
   }
 
   for (let i = 0; i < name.length; i++) {
-    db.any;
+    var table =
+      "CREATE TABLE " +
+      tableName +
+      " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
+    db.any(table).then(() => {
+      for (let i = 1; i < temp.length; i++) {
+        var add = "ALTER TABLE " + name[i] + " ADD _" + temp[i] + " INTEGER;";
+        db.any(add);
+      }
+    });
   }
 
   console.log(temp.toString());
@@ -439,6 +448,50 @@ app.post("/courseData", (req, res) => {
 
 app.post("/courseSubmission", (req, res) => {
   console.log(req.body);
+  let x = {};
+  let z = {};
+  let results = {};
+  var tempGA;
+  var GA = req.body[0]["GA"];
+  console.log(GA);
+  let courses = [];
+  for (let i = 1; i < req.body.length; i++) {
+    courses[i - 1] = req.body[i]["tablename"];
+  }
+
+  for (let i = 0; i < courses.length; i++) {
+    temp =
+      "select column_name from information_schema.columns where table_name='" +
+      courses[i] +
+      "' and column_name~'_" +
+      GA +
+      "_';";
+    console.log(temp);
+    db.any(temp).then((rows) => {
+      x[courses[i]] = rows;
+      console.log(x);
+
+      for (let j = 0; j < rows.length; j++) {
+        console.log("ssssssssss " + rows[j]["column_name"]);
+        //tempGA = rows[j]["column_name"];
+        db.any(
+          "select program_name," +
+            rows[j]["column_name"] +
+            " from " +
+            courses[i] +
+            ";"
+        ).then((columns) => {
+          z[courses[i]] = columns;
+          if (i == courses.length - 1 && j == rows.length - 1) {
+            console.log(z);
+            res.json(z);
+          }
+        });
+      }
+    });
+  }
+
+  console.log(courses);
 });
 
 app.listen(PORT, () => {
