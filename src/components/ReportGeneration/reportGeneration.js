@@ -273,7 +273,12 @@ export default class ReportGeneration extends React.Component {
         },
         body: JSON.stringify(val),
       }
-    );
+    ).then((res)=>{
+      res.json().then((data)=>{
+        console.log(data);
+        const ctx = document.getElementById("myChart").getContext("2d");
+      })
+    });
   }
   render() {
     return (
@@ -286,6 +291,7 @@ export default class ReportGeneration extends React.Component {
         <button onClick={this.addCourse}>Add Course</button>
         <br />
         <button onClick={this.parseSelect.bind(this)}>Build Report</button>
+        <canvas id="myChart" width="400" height="400"></canvas>
       </div>
     );
   }
