@@ -27,13 +27,11 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
-  console.log(req.body["GA"]);
   var x =
     "select table_name from information_schema.columns where column_name ~" +
     "'_" +
     req.body["GA"] +
     "_';";
-  console.log(x);
   db.any(x)
     .then((table_name) => {
       console.log(table_name);
@@ -53,7 +51,6 @@ app.post("/adminGA", (req, res) => {
     }
   }
   var x = temp[0];
-  console.log(x);
   var search =
     "select distinct table_name from information_schema.columns where column_name ~ " +
     "'^" +
@@ -78,7 +75,6 @@ app.post("/adminShowYear", (req, res) => {
     }
   }
   var x = temp[0];
-  console.log(x);
   var search =
     "select distinct table_name from information_schema.tables where table_name ~ " +
     "'^" +
@@ -95,7 +91,6 @@ app.post("/adminShowYear", (req, res) => {
 
 app.post("/sendMessage", (req, res) => {
   const body = req.body;
-  console.log(body);
   db.any(
     "update message set note=" +
       "'" +
@@ -118,7 +113,6 @@ app.post("/adminShowYearCourses", (req, res) => {
     }
   }
   var x = temp[0];
-  console.log(x);
   var search =
     "select distinct table_name from information_schema.tables where table_name ~ " +
     "'" +
@@ -148,8 +142,6 @@ app.post("/adminShowProgram", (req, res) => {
       }
     }
   }
-  //var x = temp[0];
-  console.log(temp);
   var search =
     "SELECT * FROM " +
     temp[0] +
@@ -158,7 +150,6 @@ app.post("/adminShowProgram", (req, res) => {
     "'" +
     temp[2] +
     "';";
-  console.log(search);
   db.any(search)
     .then((rows) => {
       res.json(rows);
@@ -322,7 +313,6 @@ app.post("/adminSubmission", (req, res) => {
 
   for (let i = 0; i < temp.length; i++) {
     temp[i] = temo[i].replace(".", "_");
-    console.log(temp[i]);
   }
 
   for (let i = 0; i < term.length; i++) {
@@ -338,7 +328,6 @@ app.post("/adminSubmission", (req, res) => {
       "_" +
       section[i] +
       "_";
-    console.log(name[i]);
   }
 
   for (let i = 0; i < name.length; i++) {
@@ -353,8 +342,6 @@ app.post("/adminSubmission", (req, res) => {
       }
     });
   }
-
-  console.log(temp.toString());
   var year1 = temp[0];
   var course1 = temp[1];
   temp.shift();
@@ -450,9 +437,11 @@ app.post("/courseSubmission", (req, res) => {
   console.log(req.body);
   let x = {};
   let z = {};
+<<<<<<< HEAD
   var tempGA;
+=======
+>>>>>>> 251ef5267a15cffd94ddcde26eccf27c5de33580
   var GA = req.body[0]["GA"];
-  console.log(GA);
   let courses = [];
   for (let i = 1; i < req.body.length; i++) {
     courses[i - 1] = req.body[i]["tablename"];
@@ -465,12 +454,10 @@ app.post("/courseSubmission", (req, res) => {
       "' and column_name~'_" +
       GA +
       "_';";
-    console.log(temp);
     db.any(temp).then((rows) => {
       x[courses[i]] = rows;
-      console.log(x);
-
       for (let j = 0; j < rows.length; j++) {
+<<<<<<< HEAD
         tempGA += "," + rows[j]["column_name"];
         tempGA = tempGA.replace("undefined", "");
 
@@ -491,6 +478,23 @@ app.post("/courseSubmission", (req, res) => {
   }
   //console.log(z);
   console.log(courses);
+=======
+        db.any(
+          "select program_name," +
+            rows[j]["column_name"] +
+            " from " +
+            courses[i] +
+            ";"
+        ).then((columns) => {
+          z[courses[i]] = columns;
+          if (i == courses.length - 1 && j == rows.length - 1) {
+            res.json(z);
+          }
+        });
+      }
+    });
+  }
+>>>>>>> 251ef5267a15cffd94ddcde26eccf27c5de33580
 });
 
 app.listen(PORT, () => {
