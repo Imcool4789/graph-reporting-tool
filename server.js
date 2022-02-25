@@ -437,11 +437,10 @@ app.post("/courseSubmission", (req, res) => {
   console.log(req.body);
   let x = {};
   let z = {};
-<<<<<<< HEAD
+  let allGA = [];
   var tempGA;
-=======
->>>>>>> 251ef5267a15cffd94ddcde26eccf27c5de33580
   var GA = req.body[0]["GA"];
+  var iter = 0;
   let courses = [];
   for (let i = 1; i < req.body.length; i++) {
     courses[i - 1] = req.body[i]["tablename"];
@@ -457,7 +456,8 @@ app.post("/courseSubmission", (req, res) => {
     db.any(temp).then((rows) => {
       x[courses[i]] = rows;
       for (let j = 0; j < rows.length; j++) {
-<<<<<<< HEAD
+        allGA[iter] = rows[j]["column_name"];
+        iter++;
         tempGA += "," + rows[j]["column_name"];
         tempGA = tempGA.replace("undefined", "");
 
@@ -465,8 +465,13 @@ app.post("/courseSubmission", (req, res) => {
           db.any(
             "select program_name" + tempGA + " from " + courses[i] + ";"
           ).then((columns) => {
+            //console.log(columns);
             z[courses[i]] = columns;
-            if (i == courses.length - 1) {
+            if (i == courses.length - 1 && j == rows.length - 1) {
+              let unique = [...new Set(allGA)];
+              z[courses[i]] = columns;
+              z["GAS"] = unique;
+              z["Courses"] = courses;
               res.json(z);
               console.log(z);
             }
@@ -476,25 +481,8 @@ app.post("/courseSubmission", (req, res) => {
       }
     });
   }
-  //console.log(z);
+  console.log(z);
   console.log(courses);
-=======
-        db.any(
-          "select program_name," +
-            rows[j]["column_name"] +
-            " from " +
-            courses[i] +
-            ";"
-        ).then((columns) => {
-          z[courses[i]] = columns;
-          if (i == courses.length - 1 && j == rows.length - 1) {
-            res.json(z);
-          }
-        });
-      }
-    });
-  }
->>>>>>> 251ef5267a15cffd94ddcde26eccf27c5de33580
 });
 
 app.listen(PORT, () => {
