@@ -489,7 +489,7 @@ app.post("/courseSubmission", (req, res) => {
       }
     });
   }
-  console.log(z);
+  //console.log(z);
   console.log(courses);
 });
 
