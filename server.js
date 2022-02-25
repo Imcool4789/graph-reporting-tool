@@ -450,7 +450,6 @@ app.post("/courseSubmission", (req, res) => {
   console.log(req.body);
   let x = {};
   let z = {};
-  let results = {};
   var tempGA;
   var GA = req.body[0]["GA"];
   console.log(GA);
@@ -472,25 +471,26 @@ app.post("/courseSubmission", (req, res) => {
       console.log(x);
 
       for (let j = 0; j < rows.length; j++) {
-        console.log("ssssssssss " + rows[j]["column_name"]);
-        //tempGA = rows[j]["column_name"];
-        db.any(
-          "select program_name," +
-            rows[j]["column_name"] +
-            " from " +
-            courses[i] +
-            ";"
-        ).then((columns) => {
-          z[courses[i]] = columns;
-          if (i == courses.length - 1 && j == rows.length - 1) {
-            console.log(z);
-            res.json(z);
-          }
-        });
+        tempGA += "," + rows[j]["column_name"];
+        tempGA = tempGA.replace("undefined", "");
+
+        if (j == rows.length - 1) {
+          db.any(
+            "select program_name" + tempGA + " from " + courses[i] + ";"
+          ).then((columns) => {
+            z[courses[i]] = columns;
+            if (i == courses.length - 1) {
+              res.json(z);
+              //     res.json(z);
+              console.log(z);
+            }
+          });
+          tempGA = "";
+        }
       }
     });
   }
-
+  console.log(z);
   console.log(courses);
 });
 
