@@ -481,7 +481,6 @@ app.post("/courseSubmission", (req, res) => {
             z[courses[i]] = columns;
             if (i == courses.length - 1) {
               res.json(z);
-              //     res.json(z);
               console.log(z);
             }
           });
