@@ -1,4 +1,6 @@
 import React from "react";
+import * as Chart from "chart.js";
+import ProgramGAMapping from "../../util/DataObjects/ProgramGAMapping";
 
 export default class ReportGeneration extends React.Component {
   constructor(props) {
@@ -273,12 +275,76 @@ export default class ReportGeneration extends React.Component {
         },
         body: JSON.stringify(val),
       }
-    ).then((res)=>{
-      res.json().then((data)=>{
+    ).then((res) => {
+      res.json().then((data) => {
         console.log(data);
-        const ctx = document.getElementById("myChart").getContext("2d");
-      })
+        let dataMap=[];
+        for(let i in data){
+          let dataSet=new ProgramGAMapping(i);
+          for(let j in data[i]){
+           for(let k in data[i][j]){
+             console.log(data[i][j][k]);
+           }
+          }
+        }
+        this.updateChart();
+      });
     });
+  }
+  updateChart(event) {
+    const ctx = document.getElementById("myChart").getContext("2d");
+    const labels = ["test"];
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          label: "Dataset 1",
+          backgroundColor: "#b82e2e",
+          data: [6, 1],
+          stack:0
+        },
+        {
+          label: "Dataset 3",
+          backgroundColor: "#b82e2e",
+          data: [6, 1],
+          stack:0
+        },
+        {
+          label: "Dataset 2",
+          backgroundColor: "#66aa00",
+          data: [6, 5],
+          stack:1
+        },
+      ],
+    };
+    const config = {
+      type: "bar",
+      data: data,
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: "test",
+          position: "bottom",
+        },
+        responsive: true,
+        interaction: {
+          intersect: false,
+        },
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      },
+    };
+    new Chart(ctx, config);
   }
   render() {
     return (
