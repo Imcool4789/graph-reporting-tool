@@ -38,7 +38,6 @@ router.post("/timestamp", (req, res) => {
         subm = rows[0]["email"];
         subm = subm.replace(".", "");
         subm = subm.replace("@", "");
-        console.log(subm);
         db.any("select coursename,timestamp from " + subm + ";").then(
           (rows) => {
             roles["timestamp"] = rows;
@@ -51,7 +50,6 @@ router.post("/timestamp", (req, res) => {
 
 router.post("/access", (req, res) => {
   const body = req.body;
-  console.log(body.sessionID);
   let roles = {};
   db.any(
     "create table if not exists instructors (id serial primary key, email varchar, course varchar, number integer, section varchar, year integer, term varchar);"
@@ -84,7 +82,6 @@ router.post("/access", (req, res) => {
                 subm = rows[0]["email"];
                 subm = subm.replace(".", "");
                 subm = subm.replace("@", "");
-                console.log(subm);
                 db.any(
                   "create table if not exists " +
                     subm +
@@ -93,14 +90,12 @@ router.post("/access", (req, res) => {
                   db.any("select coursename,timestamp from " + subm + ";").then(
                     (rows) => {
                       roles["Timestamp"] = rows;
-                      console.log(roles);
                     }
                   );
                 });
               });
             })
             .then(() => {
-              console.log(roles);
               res.json(roles);
             });
         });
@@ -110,7 +105,6 @@ router.post("/access", (req, res) => {
 });
 router.post("/compare", (req, res) => {
   const body = req.body;
-  console.log(req.body);
   db.any("SELECT hash from secret where email ='" + body.email + "';")
     .then((rows) => {
       if (rows.length > 0) {
@@ -126,9 +120,6 @@ router.post("/compare", (req, res) => {
           res.cookie("sessionID", req.sessionID);
           res.sendStatus(200);
         } else {
-          console.log(
-            "The username or password that you have entered is wrong"
-          );
           res.sendStatus(403);
         }
       } else {

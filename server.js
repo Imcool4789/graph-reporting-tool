@@ -235,7 +235,6 @@ app.post("/departmentSubmission", (req, res) => {
                 subTable = unique[j];
                 subTable = subTable.replace(".", "");
                 subTable = subTable.replace("@", "");
-                console.log(subTable + " , " + unique[j] + " , " + j);
                 db.any(
                   "insert into " +
                     subTable +
@@ -465,7 +464,6 @@ app.post("/courseSubmission", (req, res) => {
           db.any(
             "select program_name" + tempGA + " from " + courses[i] + ";"
           ).then((columns) => {
-            //console.log(columns);
             z[courses[i]] = columns;
             if (i == courses.length - 1 && j == rows.length - 1) {
               let unique = [...new Set(allGA)];
@@ -473,7 +471,6 @@ app.post("/courseSubmission", (req, res) => {
               z["GAS"] = unique;
               z["Courses"] = courses;
               res.json(z);
-              console.log(z);
             }
           });
           tempGA = "";
@@ -481,8 +478,6 @@ app.post("/courseSubmission", (req, res) => {
       }
     });
   }
-  console.log(z);
-  console.log(courses);
 });
 
 app.listen(PORT, () => {
