@@ -277,14 +277,22 @@ export default class ReportGeneration extends React.Component {
       }
     ).then((res) => {
       res.json().then((data) => {
+        let dataMapping=[];
         console.log(data);
-        let dataMap=[];
-        for(let i in data){
-          let dataSet=new ProgramGAMapping(i);
-          for(let j in data[i]){
-           for(let k in data[i][j]){
-             console.log(data[i][j][k]);
-           }
+        let gas=data.GAS;
+        let courses=data.Courses;
+        for (let i in courses){
+          dataMapping.push(new ProgramGAMapping(data[courses[i]]));
+          for(let j in data[courses[i]]){
+            let arr=data[courses[i]][j];
+            let programName=arr.program_name;
+            for(let ga in gas){
+              if(Object.keys(arr).includes(gas[ga])){
+                console.log("Program Name: "+programName);
+                console.log("GA: "+gas[ga]);
+                console.log("GA Value: "+arr[gas[ga]]);
+              }
+            }
           }
         }
         this.updateChart();

@@ -466,11 +466,13 @@ app.post("/courseSubmission", (req, res) => {
             z[courses[i]] = columns;
             if (i == courses.length - 1 && j == rows.length - 1) {
               let unique = [...new Set(allGA)];
-              let uniquePrograms=[...new Set(columns.map(i=>i.program_name))];
+              let uniquePrograms = [
+                ...new Set(columns.map((i) => i.program_name)),
+              ];
               z[courses[i]] = columns;
               z["GAS"] = unique;
               z["Courses"] = courses;
-              z["Programs"]=uniquePrograms;
+              z["Programs"] = uniquePrograms;
               res.json(z);
             }
           });
