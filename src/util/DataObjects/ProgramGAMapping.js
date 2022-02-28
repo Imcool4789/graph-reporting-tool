@@ -24,7 +24,6 @@ export default class ProgramGAMapping{
         }
         if(!found){
             this.#GADataMapping.push(new GADataMapping(ga,label,num));
-
         }
     }
     getData(){

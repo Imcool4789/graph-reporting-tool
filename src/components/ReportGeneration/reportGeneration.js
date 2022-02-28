@@ -282,24 +282,23 @@ export default class ReportGeneration extends React.Component {
         let gas=data.GAS;
         let courses=data.Courses;
         for (let i in courses){
-          dataMapping.push(new ProgramGAMapping(data[courses[i]]));
+          let program=new ProgramGAMapping(courses[i]);
           for(let j in data[courses[i]]){
             let arr=data[courses[i]][j];
             let programName=arr.program_name;
             for(let ga in gas){
               if(Object.keys(arr).includes(gas[ga])){
-                console.log("Program Name: "+programName);
-                console.log("GA: "+gas[ga]);
-                console.log("GA Value: "+arr[gas[ga]]);
+                program.addlabels(programName,gas[ga],arr[gas[ga]]);
               }
             }
           }
+          dataMapping.push(program);
         }
-        this.updateChart();
+        this.updateChart(dataMapping);
       });
     });
   }
-  updateChart(event) {
+  updateChart(dataMapping) {
     const ctx = document.getElementById("myChart").getContext("2d");
     const labels = ["test"];
     const data = {
@@ -312,7 +311,7 @@ export default class ReportGeneration extends React.Component {
           stack:0
         },
         {
-          label: "Dataset 3",
+          label: "Dataset 1",
           backgroundColor: "#b82e2e",
           data: [6, 1],
           stack:0
