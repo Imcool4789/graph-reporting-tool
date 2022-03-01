@@ -26,10 +26,7 @@ export default class ProgramGAMapping{
             this.#GADataMapping.push(new GADataMapping(ga,label,num));
         }
     }
-    getData(){
-        return this.data;
-    }
-    setData(data){
-        this.data=data;
+    getMapping(){
+        return this.#GADataMapping;
     }
 }

@@ -19,4 +19,10 @@ export default class GADataMapping{
             this.#data.set(label,arr);
         }
     }
+    getLabels(){
+        return this.#data.keys();
+    }
+    getData(){
+        return this.#data;
+    }
 }

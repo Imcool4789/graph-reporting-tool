@@ -1,7 +1,7 @@
 import React from "react";
 import * as Chart from "chart.js";
 import ProgramGAMapping from "../../util/DataObjects/ProgramGAMapping";
-
+import HelperFunctions from "../../util/HelperFunctions";
 export default class ReportGeneration extends React.Component {
   constructor(props) {
     super(props);
@@ -277,18 +277,18 @@ export default class ReportGeneration extends React.Component {
       }
     ).then((res) => {
       res.json().then((data) => {
-        let dataMapping=[];
+        let dataMapping = [];
         console.log(data);
-        let gas=data.GAS;
-        let courses=data.Courses;
-        for (let i in courses){
-          let program=new ProgramGAMapping(courses[i]);
-          for(let j in data[courses[i]]){
-            let arr=data[courses[i]][j];
-            let programName=arr.program_name;
-            for(let ga in gas){
-              if(Object.keys(arr).includes(gas[ga])){
-                program.addlabels(programName,gas[ga],arr[gas[ga]]);
+        let gas = data.GAS;
+        let courses = data.Courses;
+        for (let i in courses) {
+          let program = new ProgramGAMapping(courses[i]);
+          for (let j in data[courses[i]]) {
+            let arr = data[courses[i]][j];
+            let programName = arr.program_name;
+            for (let ga in gas) {
+              if (Object.keys(arr).includes(gas[ga])) {
+                program.addlabels(programName, gas[ga], arr[gas[ga]]);
               }
             }
           }
@@ -298,31 +298,27 @@ export default class ReportGeneration extends React.Component {
       });
     });
   }
+  configureDataSet(data) {
+    let fixedData = [];
+    console.log(data);
+    data.forEach((val, key) => {
+      fixedData.push({
+        label: key,
+        backgroundColor: HelperFunctions.getRandomColor(),
+        data: val,
+      });
+    });
+
+    return fixedData;
+  }
   updateChart(dataMapping) {
     const ctx = document.getElementById("myChart").getContext("2d");
-    const labels = ["test"];
+    console.log(dataMapping);
+    const labels = ["1", "2", "3", "4"];
+    let fixedData = this.configureDataSet(dataMapping[0].getMapping()[0].getData());
     const data = {
       labels: labels,
-      datasets: [
-        {
-          label: "Dataset 1",
-          backgroundColor: "#b82e2e",
-          data: [6, 1],
-          stack:0
-        },
-        {
-          label: "Dataset 1",
-          backgroundColor: "#b82e2e",
-          data: [6, 1],
-          stack:0
-        },
-        {
-          label: "Dataset 2",
-          backgroundColor: "#66aa00",
-          data: [6, 5],
-          stack:1
-        },
-      ],
+      datasets: fixedData
     };
     const config = {
       type: "bar",
@@ -334,20 +330,18 @@ export default class ReportGeneration extends React.Component {
         },
         title: {
           display: true,
-          text: "test",
-          position: "bottom",
+          text: dataMapping[0].getCourseCode()+" "+dataMapping[0].getMapping()[0].getGA(),
         },
         responsive: true,
-        interaction: {
-          intersect: false,
-        },
         scales: {
-          x: {
+          yAxes: [{
             stacked: true,
-          },
-          y: {
-            stacked: true,
-          },
+          }],
+          xAxes:[
+            {
+              stacked:true,
+            }
+          ]
         },
       },
     };
