@@ -2,6 +2,7 @@ import React from "react";
 import * as Chart from "chart.js";
 import ProgramGAMapping from "../../util/DataObjects/ProgramGAMapping";
 import HelperFunctions from "../../util/HelperFunctions";
+import jsPDF from "jspdf";
 export default class ReportGeneration extends React.Component {
   constructor(props) {
     super(props);
@@ -312,40 +313,57 @@ export default class ReportGeneration extends React.Component {
     return fixedData;
   }
   updateChart(dataMapping) {
-    const ctx = document.getElementById("myChart").getContext("2d");
-    console.log(dataMapping);
-    const labels = ["1", "2", "3", "4"];
-    let fixedData = this.configureDataSet(dataMapping[0].getMapping()[0].getData());
-    const data = {
-      labels: labels,
-      datasets: fixedData
-    };
-    const config = {
-      type: "bar",
-      data: data,
-      options: {
-        maintainAspectRatio: false,
-        legend: {
-          position: "top",
-        },
-        title: {
-          display: true,
-          text: dataMapping[0].getCourseCode()+" "+dataMapping[0].getMapping()[0].getGA(),
-        },
-        responsive: true,
-        scales: {
-          yAxes: [{
-            stacked: true,
-          }],
-          xAxes:[
-            {
-              stacked:true,
-            }
-          ]
-        },
-      },
-    };
-    new Chart(ctx, config);
+    for (let i in dataMapping) {
+      for (let j in dataMapping[i].getMapping()) {
+        const ctx = document.createElement('canvas');
+        ctx.width = 400;
+        ctx.height = 400;
+        const labels = ["1", "2", "3", "4"];
+        let fixedData = this.configureDataSet(dataMapping[i].getMapping()[j].getData());
+        const data = {
+          labels: labels,
+          datasets: fixedData
+        };
+        let c = new Chart(ctx, {
+          type: "bar",
+          data: data,
+          options: {
+            maintainAspectRatio: false,
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: dataMapping[i].getCourseCode() + " GA " + dataMapping[i].getMapping()[j].getGA(),
+            },
+            animation: {
+              onComplete: function () {
+                let pdf = new jsPDF('p', 'mm', 'a4');
+                pdf.addImage(
+                  c.toBase64Image(),
+                  "PNG",
+                  10, 10,
+                  c.clientWidth,
+                  c.clientHeight
+                );
+                pdf.save("chart.pdf");
+              }
+            },
+            responsive: false,
+            scales: {
+              yAxes: [{
+                stacked: true,
+              }],
+              xAxes: [
+                {
+                  stacked: true,
+                }
+              ]
+            },
+          },
+        });
+      }
+    }
   }
   render() {
     return (
@@ -358,7 +376,6 @@ export default class ReportGeneration extends React.Component {
         <button onClick={this.addCourse}>Add Course</button>
         <br />
         <button onClick={this.parseSelect.bind(this)}>Build Report</button>
-        <canvas id="myChart" width="400" height="400"></canvas>
       </div>
     );
   }
