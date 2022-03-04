@@ -318,25 +318,27 @@ export default class ReportGeneration extends React.Component {
   updateChart(dataMapping) {
     font1();
     font2();
-    let pdf = new jsPDF('p', 'mm', 'a4');
+    let pdf = new jsPDF("p", "mm", "a4");
     let image = new Image();
     image.src = process.env.PUBLIC_URL + "/carletonLogo.png";
-    console.log(image.src)
-    pdf.addImage(image, "png", 10, 78, 12, 15);
+    console.log(image.src);
+    pdf.addImage(image, "png", 35, 40, 140, 60);
     pdf.setFont("Lato-Regular", "normal");
     pdf.setFontSize(28);
     pdf.text("Faculty of Engineering", 20, 20);
     pdf.addPage();
     for (let i in dataMapping) {
       for (let j in dataMapping[i].getMapping()) {
-        const ctx = document.createElement('canvas');
+        const ctx = document.createElement("canvas");
         ctx.width = 400;
         ctx.height = 400;
         const labels = ["1", "2", "3", "4"];
-        let fixedData = this.configureDataSet(dataMapping[i].getMapping()[j].getData());
+        let fixedData = this.configureDataSet(
+          dataMapping[i].getMapping()[j].getData()
+        );
         const data = {
           labels: labels,
-          datasets: fixedData
+          datasets: fixedData,
         };
         let c = new Chart(ctx, {
           type: "bar",
@@ -348,30 +350,36 @@ export default class ReportGeneration extends React.Component {
             },
             title: {
               display: true,
-              text: dataMapping[i].getCourseCode() + " GA " + dataMapping[i].getMapping()[j].getGA(),
+              text:
+                dataMapping[i].getCourseCode() +
+                " GA " +
+                dataMapping[i].getMapping()[j].getGA(),
             },
             animation: {
               onComplete: function () {
                 pdf.addImage(
                   c.toBase64Image(),
                   "PNG",
-                  10, 10,
+                  10,
+                  10,
                   c.clientWidth,
                   c.clientHeight
                 );
                 pdf.save("chart.pdf");
-              }
+              },
             },
             responsive: false,
             scales: {
-              yAxes: [{
-                stacked: true,
-              }],
+              yAxes: [
+                {
+                  stacked: true,
+                },
+              ],
               xAxes: [
                 {
                   stacked: true,
-                }
-              ]
+                },
+              ],
             },
           },
         });
@@ -379,9 +387,7 @@ export default class ReportGeneration extends React.Component {
       }
     }
   }
-  addPDF() {
-
-  }
+  addPDF() {}
   render() {
     return (
       <div id="parent">
