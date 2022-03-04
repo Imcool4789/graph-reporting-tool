@@ -3,12 +3,15 @@ import * as Chart from "chart.js";
 import ProgramGAMapping from "../../util/DataObjects/ProgramGAMapping";
 import HelperFunctions from "../../util/HelperFunctions";
 import jsPDF from "jspdf";
+import font1 from "../../util/fonts/Lato-Light-normal";
+import font2 from "../../util/fonts/Lato-Regular-normal";
 export default class ReportGeneration extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       id: 0,
       dataMap: new Map(),
+      pdf: null,
     };
     this.addCourse = this.addCourse.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -313,6 +316,17 @@ export default class ReportGeneration extends React.Component {
     return fixedData;
   }
   updateChart(dataMapping) {
+    font1();
+    font2();
+    let pdf = new jsPDF('p', 'mm', 'a4');
+    let image = new Image();
+    image.src = process.env.PUBLIC_URL + "/carletonLogo.png";
+    console.log(image.src)
+    pdf.addImage(image, "png", 10, 78, 12, 15);
+    pdf.setFont("Lato-Regular", "normal");
+    pdf.setFontSize(28);
+    pdf.text("Faculty of Engineering", 20, 20);
+    pdf.addPage();
     for (let i in dataMapping) {
       for (let j in dataMapping[i].getMapping()) {
         const ctx = document.createElement('canvas');
@@ -338,7 +352,6 @@ export default class ReportGeneration extends React.Component {
             },
             animation: {
               onComplete: function () {
-                let pdf = new jsPDF('p', 'mm', 'a4');
                 pdf.addImage(
                   c.toBase64Image(),
                   "PNG",
@@ -362,8 +375,12 @@ export default class ReportGeneration extends React.Component {
             },
           },
         });
+        document.body.appendChild(ctx);
       }
     }
+  }
+  addPDF() {
+
   }
   render() {
     return (
