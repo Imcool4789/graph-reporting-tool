@@ -322,7 +322,7 @@ export default class ReportGeneration extends React.Component {
     let image = new Image();
     image.src = process.env.PUBLIC_URL + "/carletonLogo.png";
     console.log(image.src);
-    pdf.addImage(image, "png", 35, 40, 140, 60);
+    pdf.addImage(image, "png", 32, 40, 140, 60);
     pdf.setFont("Lato-Regular", "normal");
     pdf.setFontSize(28);
     pdf.text("Faculty of Engineering", 20, 20);
