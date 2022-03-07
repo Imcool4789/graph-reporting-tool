@@ -61,7 +61,6 @@ export default class ReportGeneration extends React.Component {
               let arr = data[i].table_name.split("_").filter((e) => e !== "");
               map.push(arr);
             }
-            console.log(map);
             this.setState({
               dataMap: map,
             });
@@ -76,15 +75,12 @@ export default class ReportGeneration extends React.Component {
   }
   getUniqueVals(arr) {
     let set = new Set();
-    console.log(arr);
     if (arr.length === 0) {
       for (let i = 0; i < this.state.dataMap.length; i++) {
         set.add(this.state.dataMap[i][0]);
       }
     } else {
-      console.log(arr);
       for (let i = 0; i < this.state.dataMap.length; i++) {
-        console.log(this.state.dataMap[i].includes(arr));
         if (arr.every((r) => this.state.dataMap[i].includes(r))) {
           set.add(this.state.dataMap[i][arr.length]);
         }
@@ -111,8 +107,7 @@ export default class ReportGeneration extends React.Component {
       this.remove("course" + divVal);
       this.remove("number" + divVal);
       this.remove("section" + divVal);
-      val.push(document.getElementById(year.id).value);
-      this.populateCourse(div, val, divVal);
+      this.populateCourse(div, [val[0],document.getElementById(year.id).value], divVal);
     }.bind(this);
     div.insertBefore(year, div.lastChild);
   }
@@ -134,8 +129,7 @@ export default class ReportGeneration extends React.Component {
     course.onchange = function () {
       this.remove("number" + divVal);
       this.remove("section" + divVal);
-      val.push(document.getElementById(course.id).value);
-      this.populateNumber(div, val, divVal);
+      this.populateNumber(div, [val[0],val[1],document.getElementById(course.id).value], divVal);
     }.bind(this);
     div.insertBefore(course, div.lastChild);
   }
@@ -156,8 +150,7 @@ export default class ReportGeneration extends React.Component {
     }
     number.onchange = function () {
       this.remove("section" + divVal);
-      val.push(document.getElementById(number.id).value);
-      this.populateSection(div, val, divVal);
+      this.populateSection(div, [val[0],val[1],val[2],document.getElementById(number.id).value], divVal);
     }.bind(this);
     div.insertBefore(number, div.lastChild);
   }
@@ -275,8 +268,8 @@ export default class ReportGeneration extends React.Component {
     ).then((res) => {
       res.json().then((data) => {
         let dataMapping = [];
-        console.log(data);
         let gas = data.GAS;
+        console.log(gas);
         let courses = data.Courses;
         for (let i in courses) {
           let program = new ProgramGAMapping(courses[i]);
@@ -291,13 +284,13 @@ export default class ReportGeneration extends React.Component {
           }
           dataMapping.push(program);
         }
-        this.updateChart(dataMapping);
+        console.log(dataMapping);
+        //this.updateChart(dataMapping);
       });
     });
   }
   configureDataSet(data) {
     let fixedData = [];
-    console.log(data);
     data.forEach((val, key) => {
       fixedData.push({
         label: key,
@@ -308,13 +301,12 @@ export default class ReportGeneration extends React.Component {
 
     return fixedData;
   }
-  updateChart(dataMapping) {
+  createTitlePage(){
     font1();
     font2();
     let pdf = new jsPDF("p", "mm", "a4");
     let image = new Image();
     image.src = process.env.PUBLIC_URL + "/carletonLogo.png";
-    console.log(image.src);
     pdf.addImage(image, "png", 21.8, 45, 163, 53);
     pdf.setFont("Lato-Regular", "normal");
     pdf.setFontSize(28);
@@ -324,6 +316,12 @@ export default class ReportGeneration extends React.Component {
     pdf.text("Month Year", 87.3, 140);
     pdf.text("Graduate Attribute Report", 68.8, 177.3);
     pdf.addPage();
+    this.setState({
+      pdf:pdf
+    })
+  }
+  updateChart(dataMapping) {
+    this.createTitlePage();
     for (let i in dataMapping) {
       for (let j in dataMapping[i].getMapping()) {
         const ctx = document.createElement("canvas");
@@ -352,19 +350,7 @@ export default class ReportGeneration extends React.Component {
                 " GA " +
                 dataMapping[i].getMapping()[j].getGA(),
             },
-            animation: {
-              onComplete: function () {
-                pdf.addImage(
-                  c.toBase64Image(),
-                  "PNG",
-                  10,
-                  10,
-                  c.clientWidth,
-                  c.clientHeight
-                );
-                pdf.save("chart.pdf");
-              },
-            },
+            animation:false,
             responsive: false,
             scales: {
               yAxes: [
@@ -380,11 +366,21 @@ export default class ReportGeneration extends React.Component {
             },
           },
         });
-        document.body.appendChild(ctx);
+       this.test(c);
       }
     }
   }
-  addPDF() {}
+  test(c) {
+    this.state.pdf.addImage(
+      c.toBase64Image(),
+      "PNG",
+      10,
+      10,
+      c.clientWidth,
+      c.clientHeight
+    );
+    this.state.pdf.save("chart.pdf");
+  }
   render() {
     return (
       <div id="parent">

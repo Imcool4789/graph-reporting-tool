@@ -34,7 +34,6 @@ app.post("/queryGA", (req, res) => {
     "_';";
   db.any(x)
     .then((table_name) => {
-      console.log(table_name);
       res.json(table_name);
     })
     .catch((error) => {
