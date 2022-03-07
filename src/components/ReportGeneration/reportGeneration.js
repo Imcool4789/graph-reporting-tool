@@ -269,8 +269,8 @@ export default class ReportGeneration extends React.Component {
       res.json().then((data) => {
         let dataMapping = [];
         let gas = data.GAS;
-        console.log(gas);
         let courses = data.Courses;
+        console.log(data);
         for (let i in courses) {
           let program = new ProgramGAMapping(courses[i]);
           for (let j in data[courses[i]]) {
@@ -284,10 +284,43 @@ export default class ReportGeneration extends React.Component {
           }
           dataMapping.push(program);
         }
-        console.log(dataMapping);
-        //this.updateChart(dataMapping);
+        let gaMapping=new Map();
+        for(let ga in gas){
+          for(let course in dataMapping){
+            for(let c in dataMapping[course].getMapping()){
+            if(dataMapping[course].getMapping()[c].getGA()===gas[ga]){
+              if(typeof gaMapping.get(gas[ga])!=="undefined"){
+                let set=gaMapping.get(gas[ga]);
+                set.add(dataMapping[course].getCourseCode());
+              }else{
+                let set =new Set();
+                set.add(dataMapping[course].getCourseCode());
+                gaMapping.set(gas[ga],set);
+              }
+            }
+            }
+          }
+        }
+       this.configureChart(gaMapping,dataMapping);
       });
     });
+  }
+  configureChart(gaMapping,dataMapping){
+    this.createTitlePage();
+    let keys=Array.from(gaMapping.keys());
+    for(let i=0;i<keys.length;i++){
+      this.state.pdf.text("GA "+keys[i],7.1,14.2);
+      let arr=Array.from(gaMapping.get(keys[i]))
+      for(let j=0;j<arr.length;j++){
+        let val=arr[j];
+        for(let k=0;k<dataMapping.length;k++){
+          if(dataMapping[k].getCourseCode()===val){
+            console.log(dataMapping[k]);
+          }
+        }
+      }
+    }
+    //this.updateChart(dataMapping);
   }
   configureDataSet(data) {
     let fixedData = [];
@@ -298,7 +331,6 @@ export default class ReportGeneration extends React.Component {
         data: val,
       });
     });
-
     return fixedData;
   }
   createTitlePage(){
@@ -321,12 +353,11 @@ export default class ReportGeneration extends React.Component {
     })
   }
   updateChart(dataMapping) {
-    this.createTitlePage();
     for (let i in dataMapping) {
       for (let j in dataMapping[i].getMapping()) {
         const ctx = document.createElement("canvas");
-        ctx.width = 400;
-        ctx.height = 400;
+        ctx.width = 681 ;
+        ctx.height = 388;
         const labels = ["1", "2", "3", "4"];
         let fixedData = this.configureDataSet(
           dataMapping[i].getMapping()[j].getData()
