@@ -56,28 +56,12 @@ export default class ReportGeneration extends React.Component {
       )
         .then((res) => {
           res.json().then((data) => {
-            let map = new Map();
-            let set = new Set();
-            map.set("term", set);
+            let map = [];
             for (let i = 0; i < data.length; i++) {
               let arr = data[i].table_name.split("_").filter((e) => e !== "");
-              for (let j = 0; j < arr.length - 1; j++) {
-                if (j === 0) {
-                  let set = map.get("term");
-                  set.add(arr[j]);
-                  map.set("term", set);
-                }
-                if (typeof map.get(arr[j]) == "undefined") {
-                  let set = new Set();
-                  set.add(arr[j + 1]);
-                  map.set(arr[j], set);
-                } else {
-                  let set = map.get(arr[j]);
-                  set.add(arr[j + 1]);
-                  map.set(arr[j], set);
-                }
-              }
+              map.push(arr);
             }
+            console.log(map);
             this.setState({
               dataMap: map,
             });
@@ -90,6 +74,24 @@ export default class ReportGeneration extends React.Component {
     }.bind(this);
     radio.appendChild(button);
   }
+  getUniqueVals(arr){
+    let set=new Set();
+    console.log(arr);
+    if(arr.length===0){
+      for(let i=0;i<this.state.dataMap.length;i++){
+        set.add(this.state.dataMap[i][0]);
+      }
+    }else{
+      console.log(arr);
+      for(let i=0;i<this.state.dataMap.length;i++){
+        console.log(this.state.dataMap[i].includes(arr));
+        if(arr.every(r=>this.state.dataMap[i].includes(r))){
+          set.add(this.state.dataMap[i][arr.length]);
+        }
+      }
+    }
+    return Array.from(set);
+  }
   populateYear(div, val, divVal) {
     let year = document.createElement("select");
     year.id = "year" + divVal;
@@ -98,8 +100,7 @@ export default class ReportGeneration extends React.Component {
     optionYear.disabled = "disabled";
     optionYear.innerHTML = "Select Year";
     year.appendChild(optionYear);
-    let map = this.state.dataMap;
-    let arr = Array.from(map.get(val));
+    let arr = this.getUniqueVals(val);
     for (let i = 0; i < arr.length; i++) {
       let optionYear = document.createElement("option");
       optionYear.value = arr[i];
@@ -110,7 +111,12 @@ export default class ReportGeneration extends React.Component {
       this.remove("course" + divVal);
       this.remove("number" + divVal);
       this.remove("section" + divVal);
-      this.populateCourse(div, document.getElementById(year.id).value, divVal);
+      val.push(document.getElementById(year.id).value);
+      this.populateCourse(
+        div,
+        val,
+        divVal,
+      );
     }.bind(this);
     div.insertBefore(year, div.lastChild);
   }
@@ -122,8 +128,7 @@ export default class ReportGeneration extends React.Component {
     optionCourse.disabled = "disabled";
     optionCourse.innerHTML = "Select Course";
     course.appendChild(optionCourse);
-    let map = this.state.dataMap;
-    let arr = Array.from(map.get(val));
+    let arr = this.getUniqueVals(val);
     for (let i = 0; i < arr.length; i++) {
       let optionCourse = document.createElement("option");
       optionCourse.value = arr[i];
@@ -133,9 +138,10 @@ export default class ReportGeneration extends React.Component {
     course.onchange = function () {
       this.remove("number" + divVal);
       this.remove("section" + divVal);
+      val.push(document.getElementById(course.id).value);
       this.populateNumber(
         div,
-        document.getElementById(course.id).value,
+       val,
         divVal
       );
     }.bind(this);
@@ -148,8 +154,7 @@ export default class ReportGeneration extends React.Component {
     optionNumber.selected = "true";
     optionNumber.disabled = "disabled";
     optionNumber.innerHTML = "Select Number";
-    let map = this.state.dataMap;
-    let arr = Array.from(map.get(val));
+    let arr = this.getUniqueVals(val);
     number.appendChild(optionNumber);
     for (let i = 0; i < arr.length; i++) {
       let optionNumber = document.createElement("option");
@@ -159,9 +164,10 @@ export default class ReportGeneration extends React.Component {
     }
     number.onchange = function () {
       this.remove("section" + divVal);
+      val.push(document.getElementById(number.id).value)
       this.populateSection(
         div,
-        document.getElementById(number.id).value,
+       val,
         divVal
       );
     }.bind(this);
@@ -175,8 +181,7 @@ export default class ReportGeneration extends React.Component {
     optionSection.disabled = "disabled";
     optionSection.innerHTML = "Select Section";
     section.appendChild(optionSection);
-    let map = this.state.dataMap;
-    let arr = Array.from(map.get(val));
+    let arr = this.getUniqueVals(val);
     for (let i = 0; i < arr.length; i++) {
       let optionSection = document.createElement("option");
       optionSection.value = arr[i];
@@ -193,8 +198,8 @@ export default class ReportGeneration extends React.Component {
     optionTerm.disabled = "disabled";
     optionTerm.innerHTML = "Select Term";
     term.appendChild(optionTerm);
-    let map = this.state.dataMap;
-    let arr = Array.from(map.get("term"));
+    let val2=[];
+    let arr = this.getUniqueVals(val2);
     for (let i = 0; i < arr.length; i++) {
       let optionTerm = document.createElement("option");
       optionTerm.value = arr[i];
@@ -206,7 +211,7 @@ export default class ReportGeneration extends React.Component {
       this.remove("course" + val);
       this.remove("number" + val);
       this.remove("section" + val);
-      this.populateYear(div, document.getElementById(term.id).value, val);
+      this.populateYear(div, [document.getElementById(term.id).value], val);
     }.bind(this);
     div.appendChild(term);
   }
@@ -325,7 +330,7 @@ export default class ReportGeneration extends React.Component {
     pdf.addImage(image, "png", 21.8, 45, 163, 53);
     pdf.setFont("Lato-Regular", "normal");
     pdf.setFontSize(28);
-    pdf.text("Faculty of Engineering", 57.4,108.5);
+    pdf.text("Faculty of Engineering", 57.4, 108.5);
     pdf.setFontSize(18);
     pdf.text("Department of Systems and Computer Engineering", 34.9, 127);
     pdf.text("Month Year", 87.3, 140);
