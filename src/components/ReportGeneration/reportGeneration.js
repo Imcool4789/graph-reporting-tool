@@ -361,8 +361,8 @@ export default class ReportGeneration extends React.Component {
     data.forEach((val, key) => {
       fixedData.push({
         label: key,
-        backgroundColor: HelperFunctions.getRandomColor(),
-        data: val,
+        backgroundColor: HelperFunctions.getReportColour(key),
+        data: val
       });
     });
     return fixedData;

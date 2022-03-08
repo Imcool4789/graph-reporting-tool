@@ -8,10 +8,9 @@ export default class HelperFunctions {
     return color;
   }
 
-  static getreportColours() {
+  static getReportColour(code) {
     let Colours = {};
-
-    Colours["Aero"] = "#2f4f4f";
+    Colours["AERO"] = "#2f4f4f";
     Colours["ARCC"] = "##8b4513";
     Colours["BMEE"] = "#008000";
     Colours["CIVE"] = "#000080";
@@ -23,7 +22,6 @@ export default class HelperFunctions {
     Colours["SENG"] = "#eee8aa";
     Colours["SREE"] = "#6495ed";
     Colours["MECH"] = "#ff00ff";
-
-    return Colours;
+    return Colours[code];
   }
 }
