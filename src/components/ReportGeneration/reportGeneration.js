@@ -309,18 +309,28 @@ export default class ReportGeneration extends React.Component {
     this.createTitlePage();
     let keys=Array.from(gaMapping.keys());
     for(let i=0;i<keys.length;i++){
-      this.state.pdf.text("GA "+keys[i],7.1,14.2);
+      this.state.pdf.text("GA "+keys[i],14.2,21.4);
       let arr=Array.from(gaMapping.get(keys[i]))
       for(let j=0;j<arr.length;j++){
         let val=arr[j];
         for(let k=0;k<dataMapping.length;k++){
           if(dataMapping[k].getCourseCode()===val){
-            console.log(dataMapping[k]);
+            for(let l=0;l<dataMapping[k].getMapping().length;l++){
+              if(dataMapping[k].getMapping()[l].getGA()===keys[i]){
+                if(j%2==0){
+                this.updateChart(dataMapping[k].getMapping()[l],dataMapping[k].getCourseCode(),14.3,27.5);
+                }else{
+                  this.updateChart(dataMapping[k].getMapping()[l],dataMapping[k].getCourseCode(),14.3,155.6);
+                }
+              }
+            }
           }
         }
       }
+
+      this.state.pdf.addPage();
     }
-    //this.updateChart(dataMapping);
+    this.state.pdf.save("chart.pdf");
   }
   configureDataSet(data) {
     let fixedData = [];
@@ -352,15 +362,13 @@ export default class ReportGeneration extends React.Component {
       pdf:pdf
     })
   }
-  updateChart(dataMapping) {
-    for (let i in dataMapping) {
-      for (let j in dataMapping[i].getMapping()) {
+  updateChart(dataMapping,courseCode,x,y) {
         const ctx = document.createElement("canvas");
         ctx.width = 681 ;
         ctx.height = 388;
         const labels = ["1", "2", "3", "4"];
         let fixedData = this.configureDataSet(
-          dataMapping[i].getMapping()[j].getData()
+          dataMapping.getData()
         );
         const data = {
           labels: labels,
@@ -377,9 +385,9 @@ export default class ReportGeneration extends React.Component {
             title: {
               display: true,
               text:
-                dataMapping[i].getCourseCode() +
+                courseCode +
                 " GA " +
-                dataMapping[i].getMapping()[j].getGA(),
+                dataMapping.getGA(),
             },
             animation:false,
             responsive: false,
@@ -397,20 +405,17 @@ export default class ReportGeneration extends React.Component {
             },
           },
         });
-       this.test(c);
-      }
-    }
+       this.addImage(c,x,y);
   }
-  test(c) {
+  addImage(c,x,y) {
     this.state.pdf.addImage(
       c.toBase64Image(),
       "PNG",
-      10,
-      10,
+      x,
+      y,
       c.clientWidth,
       c.clientHeight
     );
-    this.state.pdf.save("chart.pdf");
   }
   render() {
     return (

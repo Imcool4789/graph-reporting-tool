@@ -472,6 +472,7 @@ app.post("/courseSubmission", (req, res) => {
               z["GAS"] = unique;
               z["Courses"] = courses;
               z["Programs"] = uniquePrograms;
+              console.log(z);
               res.json(z);
             }
           });
