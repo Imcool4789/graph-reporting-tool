@@ -10,7 +10,8 @@ export default class InstructorSubmissions extends React.Component {
   componentDidMount(){
     this.setState({
       submissionData:this.props.submissionData
-    })
+    });
+    console.log(this.props.submissionData);
   }
   render() {
     return (
@@ -21,7 +22,7 @@ export default class InstructorSubmissions extends React.Component {
             <th>Course</th>
             <th>Date Submitted</th>
           </tr>
-          {this.state.submissionData.map((data) => (
+          {this.props.submissionData.map((data) => (
             <tr>
               <td>{data["coursename"]}</td>
               <td>

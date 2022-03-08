@@ -6,6 +6,7 @@ import Bins from "../../../util/DataObjects/Bins";
 import HelperFunctions from "../../../util/HelperFunctions";
 import html2canvas from "html2canvas";
 import pdfConverter from "jspdf";
+import alert from "alert";
 
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
@@ -21,8 +22,10 @@ export default class InstructorFileChooser extends React.Component {
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
       this.formatArray(rowObj);
+      console.log(rowObj);
       var rowString = JSON.stringify(rowObj);
-      data[i] = rowString;
+      console.log(rowString);
+      data[i] = rowObj;
     }
     this.setState({ excelData: data });
     this.buttonLogic();
@@ -72,7 +75,7 @@ export default class InstructorFileChooser extends React.Component {
           arr[i]["student_id"] = arr[i][key];
           delete arr[i][key];
         } else if (key.toLowerCase().includes("ga")) {
-          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_");
+          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_").replace("ga","_");
           arr[i][newKey] = arr[i][key];
           delete arr[i][key];
         }
@@ -99,6 +102,10 @@ export default class InstructorFileChooser extends React.Component {
     }
   }
   grabData() {
+    let bod = this.state.excelData;
+    bod["message"] = document.getElementById("Message").value;
+    bod["course"] = this.props.course;
+    bod["tName"] = this.props.table;
     fetch(
       process.env.NODE_ENV === "production"
         ? "https://graphing-report-tool.herokuapp.com/courseData"
@@ -108,14 +115,19 @@ export default class InstructorFileChooser extends React.Component {
         headers: {
           "Content-Type": "application/json",
         },
-        body: this.state.excelData[0],
+        body: JSON.stringify(bod),
       }
     )
-      .then((response) =>
-        response.json().then((data) => {
-          this.populateChart(data);
-        })
-      )
+      .then((response) => {
+        if (response.status === 403) {
+          console.log("error");
+          alert("ERROR");
+        } else {
+          response.json().then((data) => {
+            this.populateChart(data);
+          });
+        }
+      })
       .catch((error) => {
         console.error("Error:", error);
       });
@@ -224,27 +236,6 @@ export default class InstructorFileChooser extends React.Component {
     }
     return dataBins;
   }
-  sendMessage() {
-    let data = {};
-    data["message"] = document.getElementById("Message").value;
-    data["table"] = this.props.table;
-    data["course"] = this.props.course;
-    let bod = JSON.stringify(data);
-    fetch(
-      process.env.NODE_ENV === "production"
-        ? "https://graphing-report-tool.herokuapp.com/sendMessage"
-        : "http://localhost:5000/sendMessage",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: bod,
-      }
-    ).catch((error) => {
-      console.log(error);
-    });
-  }
   convertToPdf() {
     let chart = window.document.getElementById("myChart");
     html2canvas(chart).then((canvas) => {
@@ -270,7 +261,6 @@ export default class InstructorFileChooser extends React.Component {
     let r = window.confirm("Are you sure you wish to upload this spreadsheet?");
     if (r) {
       this.grabData();
-      this.sendMessage();
     }
   }
   render() {

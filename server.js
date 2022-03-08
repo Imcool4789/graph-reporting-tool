@@ -88,20 +88,6 @@ app.post("/adminShowYear", (req, res) => {
     });
 });
 
-app.post("/sendMessage", (req, res) => {
-  const body = req.body;
-  db.any(
-    "update message set note=" +
-      "'" +
-      body +
-      "'" +
-      " where course=" +
-      "'" +
-      "f21_sysc4101_a" +
-      "';"
-  );
-});
-
 app.post("/adminShowYearCourses", (req, res) => {
   let temp = [];
   for (let i = 0; i < req.body.length; i++) {
@@ -361,73 +347,85 @@ app.post("/adminSubmission", (req, res) => {
 app.post("/courseData", (req, res) => {
   db.any("SELECT * from student_program_mapping;")
     .then((rows) => {
-      for (let i = 0; i < req.body.length; i++) {
+      let data = req.body["0"];
+      for (let i = 0; i < data.length; i++) {
         for (let j = 0; j < rows.length; j++) {
-          if (req.body[i]["student_id"] === rows[j]["student_id"]) {
-            req.body[i]["program_name"] = rows[j]["program_name"];
-            delete req.body[i]["student_id"];
+          if (data[i]["student_id"] === rows[j]["student_id"]) {
+            data[i]["program_name"] = rows[j]["program_name"];
+            delete data[i]["student_id"];
             break;
           }
         }
       }
-      let dbName = "f21_sysc4101_a";
-      let tname = "";
-      let coursname = "";
-      let message = "";
+      let tname = req.body["tName"];
+      console.log(tname);
+      let courseName = "_" + req.body["course"]+"_";
+      console.log(courseName);
+      let message = req.body["message"];
+      console.log(message);
       db.any(
         "update " +
           tname +
-          "set timestamp='" +
+          " set timestamp='" +
           Date.now() +
           "' where coursename='" +
-          coursname +
+          courseName +
           "';"
-      );
+      ).catch((error) => {
+        console.log(error);
+        res.sendStatus(403);
+      });
       db.any(
         "update " +
           tname +
-          "set message='" +
+          " set message='" +
           message +
           "' where coursename='" +
-          coursname +
+          courseName +
           "';"
-      );
-      db.any("Delete from " + dbName)
+      ).catch((error) => {
+        console.log(error);
+        res.sendStatus(403);
+      });
+      db.any("Delete from " + courseName)
         .then(() => {
-          let query = "INSERT INTO " + dbName + " (";
-          let keys = Object.keys(req.body[0]);
+          let query = "INSERT INTO " + courseName + " (";
+          let keys = Object.keys(data[0]);
           for (let i = 0; i < keys.length - 1; i++) {
             query += keys[i] + ",";
           }
           query += keys[keys.length - 1] + ") VALUES (";
-          for (let i = 0; i < req.body.length; i++) {
+          for (let i = 0; i < data.length; i++) {
             let tempQuery = query;
             for (let j = 0; j < keys.length - 1; j++) {
               if (keys[j] === "program_name") {
-                tempQuery += "'" + req.body[i][keys[j]] + "',";
+                tempQuery += "'" + data[i][keys[j]] + "',";
               } else {
-                tempQuery += req.body[i][keys[j]] + ",";
+                tempQuery += data[i][keys[j]] + ",";
               }
             }
             if (keys[keys.length - 1] === "program_name") {
-              tempQuery += "'" + req.body[i][keys[keys.length - 1]] + "');";
+              tempQuery += "'" + data[i][keys[keys.length - 1]] + "');";
             } else {
-              tempQuery += req.body[i][keys[keys.length - 1]] + ");";
+              tempQuery += data[i][keys[keys.length - 1]] + ");";
             }
-            db.any(tempQuery)
-              .then(() => {})
-              .catch((error) => {
-                console.log(error);
-              });
+            db.any(tempQuery).catch((error) => {
+              console.log(error);
+              res.sendStatus(403);
+            });
           }
+        })
+        .then(() => {
+          res.send(data);
         })
         .catch((error) => {
           console.log(error);
+          res.sendStatus(403);
         });
-      res.send(req.body);
     })
     .catch((error) => {
       console.log(error);
+      res.sendStatus(403);
     });
 });
 
@@ -464,7 +462,7 @@ app.post("/courseSubmission", (req, res) => {
               z[courses[i]] = columns;
             })
             .then(() => {
-              if(courses.every((r) => Object.keys(z).includes(r))){
+              if (courses.every((r) => Object.keys(z).includes(r))) {
                 let unique = [...new Set(allGA)];
                 z["GAS"] = unique;
                 z["Courses"] = courses;

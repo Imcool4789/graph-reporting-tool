@@ -329,7 +329,7 @@ export default class ReportGeneration extends React.Component {
           if (dataMapping[k].getCourseCode() === val) {
             for (let l = 0; l < dataMapping[k].getMapping().length; l++) {
               if (dataMapping[k].getMapping()[l].getGA() === keys[i]) {
-                if (j % 2 == 0) {
+                if (j % 2 === 0) {
                   this.updateChart(
                     dataMapping[k].getMapping()[l],
                     dataMapping[k].getCourseCode(),

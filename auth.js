@@ -82,6 +82,7 @@ router.post("/access", (req, res) => {
                 subm = rows[0]["email"];
                 subm = subm.replace(".", "");
                 subm = subm.replace("@", "");
+                roles["table"]=subm;
                 db.any(
                   "create table if not exists " +
                     subm +
@@ -89,15 +90,16 @@ router.post("/access", (req, res) => {
                 ).then(() => {
                   db.any("select coursename,timestamp from " + subm + ";").then(
                     (rows) => {
-                      roles["Timestamp"] = rows;
+                      roles["timestamp"] = rows;
                     }
-                  );
-                });
+                  ).then(() => {
+                    console.log(roles);
+                    res.json(roles);
+                  });
+                })
               });
             })
-            .then(() => {
-              res.json(roles);
-            });
+            
         });
       });
     });
