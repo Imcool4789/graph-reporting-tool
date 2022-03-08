@@ -459,23 +459,19 @@ app.post("/courseSubmission", (req, res) => {
         tempGA = tempGA.replace("undefined", "");
 
         if (j == rows.length - 1) {
-          db.any(
-            "select program_name" + tempGA + " from " + courses[i] + ";"
-          ).then((columns) => {
-            z[courses[i]] = columns;
-            if (i == courses.length - 1 && j == rows.length - 1) {
-              let unique = [...new Set(allGA)];
-              let uniquePrograms = [
-                ...new Set(columns.map((i) => i.program_name)),
-              ];
+          db.any("select program_name" + tempGA + " from " + courses[i] + ";")
+            .then((columns) => {
               z[courses[i]] = columns;
-              z["GAS"] = unique;
-              z["Courses"] = courses;
-              z["Programs"] = uniquePrograms;
-              console.log(z);
-              res.json(z);
-            }
-          });
+            })
+            .then(() => {
+              if(courses.every((r) => Object.keys(z).includes(r))){
+                let unique = [...new Set(allGA)];
+                z["GAS"] = unique;
+                z["Courses"] = courses;
+                res.json(z);
+              }
+            });
+
           tempGA = "";
         }
       }

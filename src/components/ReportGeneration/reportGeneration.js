@@ -107,7 +107,11 @@ export default class ReportGeneration extends React.Component {
       this.remove("course" + divVal);
       this.remove("number" + divVal);
       this.remove("section" + divVal);
-      this.populateCourse(div, [val[0],document.getElementById(year.id).value], divVal);
+      this.populateCourse(
+        div,
+        [val[0], document.getElementById(year.id).value],
+        divVal
+      );
     }.bind(this);
     div.insertBefore(year, div.lastChild);
   }
@@ -129,7 +133,11 @@ export default class ReportGeneration extends React.Component {
     course.onchange = function () {
       this.remove("number" + divVal);
       this.remove("section" + divVal);
-      this.populateNumber(div, [val[0],val[1],document.getElementById(course.id).value], divVal);
+      this.populateNumber(
+        div,
+        [val[0], val[1], document.getElementById(course.id).value],
+        divVal
+      );
     }.bind(this);
     div.insertBefore(course, div.lastChild);
   }
@@ -150,7 +158,11 @@ export default class ReportGeneration extends React.Component {
     }
     number.onchange = function () {
       this.remove("section" + divVal);
-      this.populateSection(div, [val[0],val[1],val[2],document.getElementById(number.id).value], divVal);
+      this.populateSection(
+        div,
+        [val[0], val[1], val[2], document.getElementById(number.id).value],
+        divVal
+      );
     }.bind(this);
     div.insertBefore(number, div.lastChild);
   }
@@ -284,51 +296,63 @@ export default class ReportGeneration extends React.Component {
           }
           dataMapping.push(program);
         }
-        let gaMapping=new Map();
-        for(let ga in gas){
-          for(let course in dataMapping){
-            for(let c in dataMapping[course].getMapping()){
-            if(dataMapping[course].getMapping()[c].getGA()===gas[ga]){
-              if(typeof gaMapping.get(gas[ga])!=="undefined"){
-                let set=gaMapping.get(gas[ga]);
-                set.add(dataMapping[course].getCourseCode());
-              }else{
-                let set =new Set();
-                set.add(dataMapping[course].getCourseCode());
-                gaMapping.set(gas[ga],set);
+        let gaMapping = new Map();
+        for (let ga in gas) {
+          for (let course in dataMapping) {
+            for (let c in dataMapping[course].getMapping()) {
+              if (dataMapping[course].getMapping()[c].getGA() === gas[ga]) {
+                if (typeof gaMapping.get(gas[ga]) !== "undefined") {
+                  let set = gaMapping.get(gas[ga]);
+                  set.add(dataMapping[course].getCourseCode());
+                } else {
+                  let set = new Set();
+                  set.add(dataMapping[course].getCourseCode());
+                  gaMapping.set(gas[ga], set);
+                }
               }
-            }
             }
           }
         }
-       this.configureChart(gaMapping,dataMapping);
+        this.configureChart(gaMapping, dataMapping);
       });
     });
   }
-  configureChart(gaMapping,dataMapping){
+  configureChart(gaMapping, dataMapping) {
     this.createTitlePage();
-    let keys=Array.from(gaMapping.keys());
-    for(let i=0;i<keys.length;i++){
-      this.state.pdf.text("GA "+keys[i],14.2,21.4);
-      let arr=Array.from(gaMapping.get(keys[i]))
-      for(let j=0;j<arr.length;j++){
-        let val=arr[j];
-        for(let k=0;k<dataMapping.length;k++){
-          if(dataMapping[k].getCourseCode()===val){
-            for(let l=0;l<dataMapping[k].getMapping().length;l++){
-              if(dataMapping[k].getMapping()[l].getGA()===keys[i]){
-                if(j%2==0){
-                this.updateChart(dataMapping[k].getMapping()[l],dataMapping[k].getCourseCode(),14.3,27.5);
-                }else{
-                  this.updateChart(dataMapping[k].getMapping()[l],dataMapping[k].getCourseCode(),14.3,155.6);
+    let keys = Array.from(gaMapping.keys());
+    for (let i = 0; i < keys.length; i++) {
+      this.state.pdf.text("GA " + keys[i], 14.2, 21.4);
+      let arr = Array.from(gaMapping.get(keys[i]));
+      for (let j = 0; j < arr.length; j++) {
+        let val = arr[j];
+        for (let k = 0; k < dataMapping.length; k++) {
+          if (dataMapping[k].getCourseCode() === val) {
+            for (let l = 0; l < dataMapping[k].getMapping().length; l++) {
+              if (dataMapping[k].getMapping()[l].getGA() === keys[i]) {
+                if (j % 2 == 0) {
+                  this.updateChart(
+                    dataMapping[k].getMapping()[l],
+                    dataMapping[k].getCourseCode(),
+                    14.3,
+                    27.5
+                  );
+                } else {
+                  this.updateChart(
+                    dataMapping[k].getMapping()[l],
+                    dataMapping[k].getCourseCode(),
+                    14.3,
+                    155.6
+                  );
+                  this.state.pdf.addPage();
                 }
               }
             }
           }
         }
       }
-
-      this.state.pdf.addPage();
+      if (i !== keys.length - 1) {
+        this.state.pdf.addPage();
+      }
     }
     this.state.pdf.save("chart.pdf");
   }
@@ -343,7 +367,7 @@ export default class ReportGeneration extends React.Component {
     });
     return fixedData;
   }
-  createTitlePage(){
+  createTitlePage() {
     font1();
     font2();
     let pdf = new jsPDF("p", "mm", "a4");
@@ -359,55 +383,50 @@ export default class ReportGeneration extends React.Component {
     pdf.text("Graduate Attribute Report", 68.8, 177.3);
     pdf.addPage();
     this.setState({
-      pdf:pdf
-    })
+      pdf: pdf,
+    });
   }
-  updateChart(dataMapping,courseCode,x,y) {
-        const ctx = document.createElement("canvas");
-        ctx.width = 681 ;
-        ctx.height = 388;
-        const labels = ["1", "2", "3", "4"];
-        let fixedData = this.configureDataSet(
-          dataMapping.getData()
-        );
-        const data = {
-          labels: labels,
-          datasets: fixedData,
-        };
-        let c = new Chart(ctx, {
-          type: "bar",
-          data: data,
-          options: {
-            maintainAspectRatio: false,
-            legend: {
-              position: "top",
+  updateChart(dataMapping, courseCode, x, y) {
+    const ctx = document.createElement("canvas");
+    ctx.width = 681;
+    ctx.height = 388;
+    const labels = ["1", "2", "3", "4"];
+    let fixedData = this.configureDataSet(dataMapping.getData());
+    const data = {
+      labels: labels,
+      datasets: fixedData,
+    };
+    let c = new Chart(ctx, {
+      type: "bar",
+      data: data,
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: courseCode + " GA " + dataMapping.getGA(),
+        },
+        animation: false,
+        responsive: false,
+        scales: {
+          yAxes: [
+            {
+              stacked: true,
             },
-            title: {
-              display: true,
-              text:
-                courseCode +
-                " GA " +
-                dataMapping.getGA(),
+          ],
+          xAxes: [
+            {
+              stacked: true,
             },
-            animation:false,
-            responsive: false,
-            scales: {
-              yAxes: [
-                {
-                  stacked: true,
-                },
-              ],
-              xAxes: [
-                {
-                  stacked: true,
-                },
-              ],
-            },
-          },
-        });
-       this.addImage(c,x,y);
+          ],
+        },
+      },
+    });
+    this.addImage(c, x, y);
   }
-  addImage(c,x,y) {
+  addImage(c, x, y) {
     this.state.pdf.addImage(
       c.toBase64Image(),
       "PNG",
