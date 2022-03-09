@@ -10,18 +10,25 @@ export default class HelperFunctions {
 
   static getReportColour(code) {
     let Colours = {};
-    Colours["AERO"] = "#2f4f4f";
-    Colours["ARCC"] = "##8b4513";
-    Colours["BMEE"] = "#008000";
-    Colours["CIVE"] = "#000080";
-    Colours["COMM"] = "#ff0000";
-    Colours["SYSC"] = "#ffff00";
-    Colours["EE"] = "#000080";
-    Colours["EPHYS"] = "#00ff00";
-    Colours["EEE"] = "#00ffff";
-    Colours["SENG"] = "#eee8aa";
-    Colours["SREE"] = "#6495ed";
-    Colours["MECH"] = "#ff00ff";
+    Colours["AEROA"] = "#008000";
+    Colours["AEROB"] = "#7cfc00";
+    Colours["AEROC"] = "##00fa9a";
+    Colours["AEROD"] = "#ffff00";
+    Colours["ARCC"] = "#696969";
+    Colours["ARCCA"] = "#ff00ff";
+    Colours["ARCCB"] = "#ff1493"
+    Colours["BMEE"] = "#f5f5f5";
+    Colours["CIVE"] = "#8b0000";
+    Colours["COMM"] = "#00ffff";
+    Colours["SYSC"] = "#dda0dd";
+    Colours["EE"] = "#f0e68c";
+    Colours["EPHYS"] = "#f08080";
+    Colours["EEE"] = "#800080";
+    Colours["SENG"] = "#ffa500";
+    Colours["SREEA"] = "#00bfff";
+    Colours["SREEB"] = "#4169e1";
+    Colours["MECH"] = "#0000ff";
+    Colours["BMEE"]="#ff4500";
     return Colours[code];
   }
 }

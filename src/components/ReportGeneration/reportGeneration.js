@@ -432,8 +432,8 @@ export default class ReportGeneration extends React.Component {
       "PNG",
       x,
       y,
-      c.clientWidth,
-      c.clientHeight
+      180.2,
+      102.7
     );
   }
   render() {

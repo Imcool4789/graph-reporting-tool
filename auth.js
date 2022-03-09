@@ -93,7 +93,6 @@ router.post("/access", (req, res) => {
                       roles["timestamp"] = rows;
                     }
                   ).then(() => {
-                    console.log(roles);
                     res.json(roles);
                   });
                 })
