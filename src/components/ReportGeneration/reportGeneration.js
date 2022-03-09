@@ -5,6 +5,7 @@ import HelperFunctions from "../../util/HelperFunctions";
 import jsPDF from "jspdf";
 import font1 from "../../util/fonts/Lato-Light-normal";
 import font2 from "../../util/fonts/Lato-Regular-normal";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 export default class ReportGeneration extends React.Component {
   constructor(props) {
     super(props);
@@ -447,7 +448,25 @@ export default class ReportGeneration extends React.Component {
     let c = new Chart(ctx, {
       type: "bar",
       data: data,
+      plugins: [ChartDataLabels],
       options: {
+        plugins: {
+          datalabels: {
+            formatter: (value, ctx) => {
+              let sum = 0;
+              let dataArr = ctx.chart.data.datasets;
+              for(let i=0;i<dataArr.length;i++){
+                sum+=dataArr[i].data[ctx.dataIndex];
+              }
+              let percentage = ((value * 100) / sum).toFixed(2);
+              if (percentage > 0) {
+                return percentage+"%";
+              }else{
+                return "";
+              }
+            },
+          },
+        },
         maintainAspectRatio: false,
         legend: {
           position: "top",
