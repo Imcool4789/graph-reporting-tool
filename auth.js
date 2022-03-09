@@ -1,10 +1,7 @@
-const { default: userEvent } = require("@testing-library/user-event");
 const bcrypt = require("bcrypt");
-const { ColumnSet } = require("pg-promise");
 const connect = require("./connect");
 const db = connect.db;
 const app = connect.app;
-const PORT = connect.PORT;
 const express = connect.express;
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());

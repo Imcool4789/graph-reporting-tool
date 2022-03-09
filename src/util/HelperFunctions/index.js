@@ -1,4 +1,25 @@
 export default class HelperFunctions {
+  static COURSEMAPPING={
+    "Aerospace Engineering Stream A":"AEROA",
+    "Aerospace Engineering Stream B":"AEROB",
+    "Aerospace Engineering Stream C":"AEROC",
+    "Aerospace Engineering Stream D":"AEROD",
+    "Architectural Conservation and Sustainability Engineering":"ARCC",
+    "Architectural Conservation and Sustainability Engineering Stream A":"ARCCA",
+    "Architectural Conservation and Sustainability Engineering Stream B":"ARCCB",
+    "Biomedical and Electrical Engineering":"BMEE",
+    "Biomedical and Mechanical Engineering":"BMME",
+    "Civil Engineering":"CIVE",
+    "Communications Engineering":"COMM",
+    "Computer Systems Engineering":"SYSC",
+    "Electrical Engineering":"EE",
+    "Engineering Physics":"EPHYS",
+    "Environmental Engineering":"EEE",
+    "Mechanical Engineering":"MECH",
+    "Software Engineering":"SENG",
+    "Sustainable and Renewable Energy Stream A":"SREEA",
+    "Sustainable and Renewable Energy Stream B":"SREEB"
+  }
   static getRandomColor() {
     var letters = "0123456789ABCDEF";
     var color = "#";
@@ -7,7 +28,12 @@ export default class HelperFunctions {
     }
     return color;
   }
-
+  static getCourseMapping(){
+    return this.COURSEMAPPING;
+  }
+  static getCode(course){
+    return this.COURSEMAPPING[course];
+  }
   static getReportColour(code) {
     let Colours = {};
     Colours["AEROA"] = "#008000";

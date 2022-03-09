@@ -16,7 +16,7 @@ export default class ReportGeneration extends React.Component {
     this.addCourse = this.addCourse.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
   }
-  componentDidMount() {
+  createRadioButtons() {
     let radio = document.getElementById("radio");
     for (let i = 1; i <= 12; i++) {
       let input = document.createElement("input");
@@ -31,17 +31,63 @@ export default class ReportGeneration extends React.Component {
       radio.appendChild(label);
       radio.appendChild(document.createElement("br"));
     }
+    return radio;
+  }
+  createCheckBox() {
+    let checkBox = document.getElementById("checkBox");
+    let allCourses = HelperFunctions.getCourseMapping();
+    let keys = Object.keys(allCourses);
+    let button = document.createElement("button");
+    button.id = "selectAll";
+    button.innerHTML = "Select All";
+    button.onclick = function () {
+      let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      for (var i = 0; i < checkboxes.length; i++) {
+        if (!checkboxes[i].checked) {
+          checkboxes[i].checked = true;
+        }
+      }
+    };
+    checkBox.append(button);
+    checkBox.append(document.createElement("br"));
+    for (let i = 0; i < keys.length; i++) {
+      let input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = "programName";
+      input.id = allCourses[keys[i]];
+      input.value = allCourses[keys[i]];
+      checkBox.appendChild(input);
+      let label = document.createElement("label");
+      label.htmlFor = allCourses[keys[i]];
+      label.innerHTML = keys[i];
+      checkBox.appendChild(label);
+      checkBox.appendChild(document.createElement("br"));
+    }
+    return checkBox;
+  }
+  componentDidMount() {
+    this.createRadioButtons();
+    let checkBox = this.createCheckBox();
     let button = document.createElement("button");
     button.id = "GAButton";
-    button.innerHTML = "Confirm GA";
+    button.innerHTML = "Confirm GA and Programs";
     button.onclick = function () {
       let del = document.getElementById("courseSelection");
       while (del.firstChild) {
         del.firstChild.remove();
       }
-      let ga = JSON.stringify({
-        GA: document.querySelector('input[name="GARad"]:checked').value,
+      let courses = document.querySelectorAll('input[type="checkbox"]:checked');
+      let arr = [];
+      courses.forEach((e) => {
+        arr.push(e.value);
       });
+      let GA = document.querySelector('input[name="GARad"]:checked').value;
+      console.log(arr);
+      let ga = JSON.stringify({
+        GA: GA,
+        programs: arr,
+      });
+      console.log(ga);
       fetch(
         process.env.NODE_ENV === "production"
           ? "https://graphing-report-tool.herokuapp.com/queryGA"
@@ -71,7 +117,7 @@ export default class ReportGeneration extends React.Component {
           console.error("Error:", error);
         });
     }.bind(this);
-    radio.appendChild(button);
+    checkBox.appendChild(button);
   }
   getUniqueVals(arr) {
     let set = new Set();
@@ -343,7 +389,9 @@ export default class ReportGeneration extends React.Component {
                     14.3,
                     155.6
                   );
-                  this.state.pdf.addPage();
+                  if (j !== arr.length - 1) {
+                    this.state.pdf.addPage();
+                  }
                 }
               }
             }
@@ -362,7 +410,7 @@ export default class ReportGeneration extends React.Component {
       fixedData.push({
         label: key,
         backgroundColor: HelperFunctions.getReportColour(key),
-        data: val
+        data: val,
       });
     });
     return fixedData;
@@ -427,20 +475,17 @@ export default class ReportGeneration extends React.Component {
     this.addImage(c, x, y);
   }
   addImage(c, x, y) {
-    this.state.pdf.addImage(
-      c.toBase64Image(),
-      "PNG",
-      x,
-      y,
-      180.2,
-      102.7
-    );
+    this.state.pdf.addImage(c.toBase64Image(), "PNG", x, y, 180.2, 102.7);
   }
   render() {
     return (
       <div id="parent">
         <div id="radio">
           Graduate Attributes (Please select one to start building the report):
+          <br />
+        </div>
+        <div id="checkBox">
+          Presented Programs (Please select one to start building the report):
           <br />
         </div>
         <div id="courseSelection"></div>
