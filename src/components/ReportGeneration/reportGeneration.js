@@ -281,7 +281,7 @@ export default class ReportGeneration extends React.Component {
       id: this.state.id + 1,
     });
   }
-  parseSelect() {
+  parseSelect(flag) {
     let val = [];
     val.push({
       GA: document.querySelector('input[name="GARad"]:checked').value,
@@ -329,7 +329,6 @@ export default class ReportGeneration extends React.Component {
         let dataMapping = [];
         let gas = data.GAS;
         let courses = data.Courses;
-        console.log(data);
         for (let i in courses) {
           let program = new ProgramGAMapping(courses[i]);
           for (let j in data[courses[i]]) {
@@ -360,15 +359,19 @@ export default class ReportGeneration extends React.Component {
             }
           }
         }
-        this.configureChart(gaMapping, dataMapping);
+        this.configureChart(gaMapping, dataMapping, flag);
       });
     });
   }
-  configureChart(gaMapping, dataMapping) {
-    this.createTitlePage();
+  configureChart(gaMapping, dataMapping, flag) {
+    if (flag) {
+      this.createTitlePage();
+    }
     let keys = Array.from(gaMapping.keys());
     for (let i = 0; i < keys.length; i++) {
-      this.state.pdf.text("GA " + keys[i], 14.2, 21.4);
+      if (flag) {
+        this.state.pdf.text("GA " + keys[i], 14.2, 21.4);
+      }
       let arr = Array.from(gaMapping.get(keys[i]));
       for (let j = 0; j < arr.length; j++) {
         let val = arr[j];
@@ -381,16 +384,18 @@ export default class ReportGeneration extends React.Component {
                     dataMapping[k].getMapping()[l],
                     dataMapping[k].getCourseCode(),
                     14.3,
-                    27.5
+                    27.5,
+                    flag
                   );
                 } else {
                   this.updateChart(
                     dataMapping[k].getMapping()[l],
                     dataMapping[k].getCourseCode(),
                     14.3,
-                    155.6
+                    155.6,
+                    flag
                   );
-                  if (j !== arr.length - 1) {
+                  if (j !== arr.length - 1 && flag) {
                     this.state.pdf.addPage();
                   }
                 }
@@ -399,11 +404,13 @@ export default class ReportGeneration extends React.Component {
           }
         }
       }
-      if (i !== keys.length - 1) {
+      if (i !== keys.length - 1 && flag) {
         this.state.pdf.addPage();
       }
     }
-    this.state.pdf.save("chart.pdf");
+    if (flag) {
+      this.state.pdf.save("chart.pdf");
+    }
   }
   configureDataSet(data) {
     let fixedData = [];
@@ -435,7 +442,7 @@ export default class ReportGeneration extends React.Component {
       pdf: pdf,
     });
   }
-  updateChart(dataMapping, courseCode, x, y) {
+  updateChart(dataMapping, courseCode, x, y, flag) {
     const ctx = document.createElement("canvas");
     ctx.width = 681;
     ctx.height = 388;
@@ -455,13 +462,13 @@ export default class ReportGeneration extends React.Component {
             formatter: (value, ctx) => {
               let sum = 0;
               let dataArr = ctx.chart.data.datasets;
-              for(let i=0;i<dataArr.length;i++){
-                sum+=dataArr[i].data[ctx.dataIndex];
+              for (let i = 0; i < dataArr.length; i++) {
+                sum += dataArr[i].data[ctx.dataIndex];
               }
               let percentage = ((value * 100) / sum).toFixed(2);
               if (percentage > 0) {
-                return percentage+"%";
-              }else{
+                return percentage + "%";
+              } else {
                 return "";
               }
             },
@@ -491,10 +498,17 @@ export default class ReportGeneration extends React.Component {
         },
       },
     });
-    this.addImage(c, x, y);
+    if (flag) {
+      this.addImage(c, x, y);
+    } else {
+      document.getElementsByTagName("body")[0].appendChild(ctx);
+    }
   }
   addImage(c, x, y) {
     this.state.pdf.addImage(c.toBase64Image(), "PNG", x, y, 180.2, 102.7);
+  }
+  removeCharts(){
+    document.querySelectorAll("canvas").forEach(e => e.remove());;
   }
   render() {
     return (
@@ -510,7 +524,17 @@ export default class ReportGeneration extends React.Component {
         <div id="courseSelection"></div>
         <button onClick={this.addCourse}>Add Course</button>
         <br />
-        <button onClick={this.parseSelect.bind(this)}>Build Report</button>
+        <button onClick={this.parseSelect.bind(this, true)}>
+          Build PDF Report
+        </button>
+        <br />
+        <button onClick={this.parseSelect.bind(this, false)}>
+          View Charts in Browser
+        </button>
+        <br />
+        <button onClick={this.removeCharts.bind(this)}>
+          Remove all Charts
+        </button>
       </div>
     );
   }
