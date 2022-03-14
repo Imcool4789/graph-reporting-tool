@@ -28,7 +28,7 @@ export default class InstructorSubmissions extends React.Component {
               <td>
               {data["timestamp"] == null
                 ? "Not submitted"
-                : "Submitted:" + data["timestamp"] + ""}
+                : "Submitted:" + new Date(parseInt(data["timestamp"]))}
                 </td>
             </tr>
           ))}

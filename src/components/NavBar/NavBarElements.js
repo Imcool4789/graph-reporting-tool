@@ -51,3 +51,20 @@ cursor:pointer;
     border-bottom:3px solid #01bf71;
 }
 `;
+export const LogOff = styled.button`
+color:white;
+font-weight:500;
+background: #222;
+font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+display:flex;
+align-items:center;
+text-decoration:none;
+padding 0 1rem;
+height 100%;
+cursor:pointer;
+border:0px;
+&:hover{
+  color:white;
+  background-color: #535353;
+}
+`;
