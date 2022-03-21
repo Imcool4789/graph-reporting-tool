@@ -284,14 +284,10 @@ export default class ReportGeneration extends React.Component {
   parseSelect(flag) {
     let val = [];
     let programs = document.querySelectorAll('input[type="checkbox"]:checked');
-    let arr = [];
     programs.forEach((e) => {
-      arr.push(e.value);
       val.push({ program: e.value });
     });
-    //val["program"] = arr;
 
-    //val.push({ program: programs });
     console.log(val);
     val.push({
       GA: document.querySelector('input[name="GARad"]:checked').value,
