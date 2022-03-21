@@ -5,6 +5,7 @@ import HelperFunctions from "../../util/HelperFunctions";
 import jsPDF from "jspdf";
 import font1 from "../../util/fonts/Lato-Light-normal";
 import font2 from "../../util/fonts/Lato-Regular-normal";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 export default class ReportGeneration extends React.Component {
   constructor(props) {
     super(props);
@@ -16,7 +17,7 @@ export default class ReportGeneration extends React.Component {
     this.addCourse = this.addCourse.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
   }
-  componentDidMount() {
+  createRadioButtons() {
     let radio = document.getElementById("radio");
     for (let i = 1; i <= 12; i++) {
       let input = document.createElement("input");
@@ -31,17 +32,63 @@ export default class ReportGeneration extends React.Component {
       radio.appendChild(label);
       radio.appendChild(document.createElement("br"));
     }
+    return radio;
+  }
+  createCheckBox() {
+    let checkBox = document.getElementById("checkBox");
+    let allCourses = HelperFunctions.getCourseMapping();
+    let keys = Object.keys(allCourses);
+    let button = document.createElement("button");
+    button.id = "selectAll";
+    button.innerHTML = "Select All";
+    button.onclick = function () {
+      let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      for (var i = 0; i < checkboxes.length; i++) {
+        if (!checkboxes[i].checked) {
+          checkboxes[i].checked = true;
+        }
+      }
+    };
+    checkBox.append(button);
+    checkBox.append(document.createElement("br"));
+    for (let i = 0; i < keys.length; i++) {
+      let input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = "programName";
+      input.id = allCourses[keys[i]];
+      input.value = allCourses[keys[i]];
+      checkBox.appendChild(input);
+      let label = document.createElement("label");
+      label.htmlFor = allCourses[keys[i]];
+      label.innerHTML = keys[i];
+      checkBox.appendChild(label);
+      checkBox.appendChild(document.createElement("br"));
+    }
+    return checkBox;
+  }
+  componentDidMount() {
+    this.createRadioButtons();
+    let checkBox = this.createCheckBox();
     let button = document.createElement("button");
     button.id = "GAButton";
-    button.innerHTML = "Confirm GA";
+    button.innerHTML = "Confirm GA and Programs";
     button.onclick = function () {
       let del = document.getElementById("courseSelection");
       while (del.firstChild) {
         del.firstChild.remove();
       }
-      let ga = JSON.stringify({
-        GA: document.querySelector('input[name="GARad"]:checked').value,
+      let courses = document.querySelectorAll('input[type="checkbox"]:checked');
+      let arr = [];
+      courses.forEach((e) => {
+        arr.push(e.value);
       });
+      let GA = document.querySelector('input[name="GARad"]:checked').value;
+      console.log(arr);
+      let ga = JSON.stringify({
+        GA: GA,
+        programs: arr,
+      });
+      console.log(ga);
       fetch(
         process.env.NODE_ENV === "production"
           ? "https://graphing-report-tool.herokuapp.com/queryGA"
@@ -71,7 +118,7 @@ export default class ReportGeneration extends React.Component {
           console.error("Error:", error);
         });
     }.bind(this);
-    radio.appendChild(button);
+    checkBox.appendChild(button);
   }
   getUniqueVals(arr) {
     let set = new Set();
@@ -234,8 +281,18 @@ export default class ReportGeneration extends React.Component {
       id: this.state.id + 1,
     });
   }
-  parseSelect() {
+  parseSelect(flag) {
     let val = [];
+    let programs = document.querySelectorAll('input[type="checkbox"]:checked');
+    let arr = [];
+    programs.forEach((e) => {
+      arr.push(e.value);
+      val.push({ program: e.value });
+    });
+    //val["program"] = arr;
+
+    //val.push({ program: programs });
+    console.log(val);
     val.push({
       GA: document.querySelector('input[name="GARad"]:checked').value,
     });
@@ -282,7 +339,6 @@ export default class ReportGeneration extends React.Component {
         let dataMapping = [];
         let gas = data.GAS;
         let courses = data.Courses;
-        console.log(data);
         for (let i in courses) {
           let program = new ProgramGAMapping(courses[i]);
           for (let j in data[courses[i]]) {
@@ -313,15 +369,19 @@ export default class ReportGeneration extends React.Component {
             }
           }
         }
-        this.configureChart(gaMapping, dataMapping);
+        this.configureChart(gaMapping, dataMapping, flag);
       });
     });
   }
-  configureChart(gaMapping, dataMapping) {
-    this.createTitlePage();
+  configureChart(gaMapping, dataMapping, flag) {
+    if (flag) {
+      this.createTitlePage();
+    }
     let keys = Array.from(gaMapping.keys());
     for (let i = 0; i < keys.length; i++) {
-      this.state.pdf.text("GA " + keys[i], 14.2, 21.4);
+      if (flag) {
+        this.state.pdf.text("GA " + keys[i], 14.2, 21.4);
+      }
       let arr = Array.from(gaMapping.get(keys[i]));
       for (let j = 0; j < arr.length; j++) {
         let val = arr[j];
@@ -329,32 +389,38 @@ export default class ReportGeneration extends React.Component {
           if (dataMapping[k].getCourseCode() === val) {
             for (let l = 0; l < dataMapping[k].getMapping().length; l++) {
               if (dataMapping[k].getMapping()[l].getGA() === keys[i]) {
-                if (j % 2 == 0) {
+                if (j % 2 === 0) {
                   this.updateChart(
                     dataMapping[k].getMapping()[l],
                     dataMapping[k].getCourseCode(),
                     14.3,
-                    27.5
+                    27.5,
+                    flag
                   );
                 } else {
                   this.updateChart(
                     dataMapping[k].getMapping()[l],
                     dataMapping[k].getCourseCode(),
                     14.3,
-                    155.6
+                    155.6,
+                    flag
                   );
-                  this.state.pdf.addPage();
+                  if (j !== arr.length - 1 && flag) {
+                    this.state.pdf.addPage();
+                  }
                 }
               }
             }
           }
         }
       }
-      if (i !== keys.length - 1) {
+      if (i !== keys.length - 1 && flag) {
         this.state.pdf.addPage();
       }
     }
-    this.state.pdf.save("chart.pdf");
+    if (flag) {
+      this.state.pdf.save("chart.pdf");
+    }
   }
   configureDataSet(data) {
     let fixedData = [];
@@ -362,7 +428,7 @@ export default class ReportGeneration extends React.Component {
       fixedData.push({
         label: key,
         backgroundColor: HelperFunctions.getReportColour(key),
-        data: val
+        data: val,
       });
     });
     return fixedData;
@@ -386,7 +452,7 @@ export default class ReportGeneration extends React.Component {
       pdf: pdf,
     });
   }
-  updateChart(dataMapping, courseCode, x, y) {
+  updateChart(dataMapping, courseCode, x, y, flag) {
     const ctx = document.createElement("canvas");
     ctx.width = 681;
     ctx.height = 388;
@@ -399,7 +465,25 @@ export default class ReportGeneration extends React.Component {
     let c = new Chart(ctx, {
       type: "bar",
       data: data,
+      plugins: [ChartDataLabels],
       options: {
+        plugins: {
+          datalabels: {
+            formatter: (value, ctx) => {
+              let sum = 0;
+              let dataArr = ctx.chart.data.datasets;
+              for (let i = 0; i < dataArr.length; i++) {
+                sum += dataArr[i].data[ctx.dataIndex];
+              }
+              let percentage = ((value * 100) / sum).toFixed(2);
+              if (percentage > 0) {
+                return percentage + "%";
+              } else {
+                return "";
+              }
+            },
+          },
+        },
         maintainAspectRatio: false,
         legend: {
           position: "top",
@@ -424,17 +508,17 @@ export default class ReportGeneration extends React.Component {
         },
       },
     });
-    this.addImage(c, x, y);
+    if (flag) {
+      this.addImage(c, x, y);
+    } else {
+      document.getElementsByTagName("body")[0].appendChild(ctx);
+    }
   }
   addImage(c, x, y) {
-    this.state.pdf.addImage(
-      c.toBase64Image(),
-      "PNG",
-      x,
-      y,
-      c.clientWidth,
-      c.clientHeight
-    );
+    this.state.pdf.addImage(c.toBase64Image(), "PNG", x, y, 180.2, 102.7);
+  }
+  removeCharts() {
+    document.querySelectorAll("canvas").forEach((e) => e.remove());
   }
   render() {
     return (
@@ -443,10 +527,24 @@ export default class ReportGeneration extends React.Component {
           Graduate Attributes (Please select one to start building the report):
           <br />
         </div>
+        <div id="checkBox">
+          Presented Programs (Please select one to start building the report):
+          <br />
+        </div>
         <div id="courseSelection"></div>
         <button onClick={this.addCourse}>Add Course</button>
         <br />
-        <button onClick={this.parseSelect.bind(this)}>Build Report</button>
+        <button onClick={this.parseSelect.bind(this, true)}>
+          Build PDF Report
+        </button>
+        <br />
+        <button onClick={this.parseSelect.bind(this, false)}>
+          View Charts in Browser
+        </button>
+        <br />
+        <button onClick={this.removeCharts.bind(this)}>
+          Remove all Charts
+        </button>
       </div>
     );
   }

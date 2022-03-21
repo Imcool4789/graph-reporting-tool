@@ -27,6 +27,9 @@ app.get("/test", (req, res) => {
     });
 });
 app.post("/queryGA", (req, res) => {
+  //FOR JOHN TODO
+  console.log(req.body["programs"]);
+
   var x =
     "select table_name from information_schema.columns where column_name ~" +
     "'_" +
@@ -86,20 +89,6 @@ app.post("/adminShowYear", (req, res) => {
     .catch((error) => {
       console.log(error);
     });
-});
-
-app.post("/sendMessage", (req, res) => {
-  const body = req.body;
-  db.any(
-    "update message set note=" +
-      "'" +
-      body +
-      "'" +
-      " where course=" +
-      "'" +
-      "f21_sysc4101_a" +
-      "';"
-  );
 });
 
 app.post("/adminShowYearCourses", (req, res) => {
@@ -195,6 +184,11 @@ app.post("/departmentSubmission", (req, res) => {
     ).then(() => {
       for (let i = 0; i < temp1.length; i++) {
         db.any(
+          "Insert into secret(email) " +
+            temp1[i] +
+            " on conflict (email) do nothing;"
+        );
+        db.any(
           "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
             "'" +
             temp1[i] +
@@ -267,6 +261,11 @@ app.post("/adminDepartmentSubmission", (req, res) => {
   }
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
+      db.any(
+        "Insert into secret(email) " +
+          temp1[i] +
+          " on conflict (email) do nothing;"
+      );
       db.any(
         "INSERT INTO departments(email, dep_name) VALUES (" +
           "'" +
@@ -361,86 +360,122 @@ app.post("/adminSubmission", (req, res) => {
 app.post("/courseData", (req, res) => {
   db.any("SELECT * from student_program_mapping;")
     .then((rows) => {
-      for (let i = 0; i < req.body.length; i++) {
+      let data = req.body["0"];
+      for (let i = 0; i < data.length; i++) {
         for (let j = 0; j < rows.length; j++) {
-          if (req.body[i]["student_id"] === rows[j]["student_id"]) {
-            req.body[i]["program_name"] = rows[j]["program_name"];
-            delete req.body[i]["student_id"];
+          if (data[i]["student_id"] === rows[j]["student_id"]) {
+            data[i]["program_name"] = rows[j]["program_name"];
+            delete data[i]["student_id"];
             break;
           }
         }
       }
-      let dbName = "f21_sysc4101_a";
-      let tname = "";
-      let coursname = "";
-      let message = "";
+      let tname = req.body["tName"];
+      console.log(tname);
+      let courseName = "_" + req.body["course"] + "_";
+      console.log(courseName);
+      let message = req.body["message"];
+      console.log(message);
       db.any(
         "update " +
           tname +
-          "set timestamp='" +
+          " set timestamp='" +
           Date.now() +
           "' where coursename='" +
-          coursname +
+          courseName +
           "';"
-      );
+      ).catch((error) => {
+        console.log(error);
+        res.sendStatus(403);
+      });
       db.any(
         "update " +
           tname +
-          "set message='" +
+          " set message='" +
           message +
           "' where coursename='" +
-          coursname +
+          courseName +
           "';"
-      );
-      db.any("Delete from " + dbName)
+      ).catch((error) => {
+        console.log(error);
+        res.sendStatus(403);
+      });
+      db.any("Delete from " + courseName)
         .then(() => {
-          let query = "INSERT INTO " + dbName + " (";
-          let keys = Object.keys(req.body[0]);
+          let query = "INSERT INTO " + courseName + " (";
+          let keys = Object.keys(data[0]);
           for (let i = 0; i < keys.length - 1; i++) {
             query += keys[i] + ",";
           }
           query += keys[keys.length - 1] + ") VALUES (";
-          for (let i = 0; i < req.body.length; i++) {
+          for (let i = 0; i < data.length; i++) {
             let tempQuery = query;
             for (let j = 0; j < keys.length - 1; j++) {
               if (keys[j] === "program_name") {
-                tempQuery += "'" + req.body[i][keys[j]] + "',";
+                tempQuery += "'" + data[i][keys[j]] + "',";
               } else {
-                tempQuery += req.body[i][keys[j]] + ",";
+                tempQuery += data[i][keys[j]] + ",";
               }
             }
             if (keys[keys.length - 1] === "program_name") {
-              tempQuery += "'" + req.body[i][keys[keys.length - 1]] + "');";
+              tempQuery += "'" + data[i][keys[keys.length - 1]] + "');";
             } else {
-              tempQuery += req.body[i][keys[keys.length - 1]] + ");";
+              tempQuery += data[i][keys[keys.length - 1]] + ");";
             }
-            db.any(tempQuery)
-              .then(() => {})
-              .catch((error) => {
-                console.log(error);
-              });
+            db.any(tempQuery).catch((error) => {
+              console.log(error);
+              res.sendStatus(403);
+            });
           }
+        })
+        .then(() => {
+          res.send(data);
         })
         .catch((error) => {
           console.log(error);
+          res.sendStatus(403);
         });
-      res.send(req.body);
     })
     .catch((error) => {
       console.log(error);
+      res.sendStatus(403);
     });
 });
 
 app.post("/courseSubmission", (req, res) => {
+  var pLength = 0;
+  var cLength = 0;
+  var program = "";
   let x = {};
   let z = {};
   let allGA = [];
   var tempGA;
-  var GA = req.body[0]["GA"];
+  var GA;
   var iter = 0;
   let courses = [];
-  for (let i = 1; i < req.body.length; i++) {
-    courses[i - 1] = req.body[i]["tablename"];
+
+  for (let i = 0; i < req.body.length; i++) {
+    if (req.body[i].hasOwnProperty("program")) {
+      pLength++;
+    } else if (req.body[i].hasOwnProperty("tablename")) {
+      cLength++;
+    } else {
+      GA = req.body[i]["GA"];
+    }
+  }
+
+  for (let i = 0; i < pLength; i++) {
+    if (i == 0) {
+      program += " where ";
+    }
+    program += "program_name='" + req.body[i]["program"] + "'";
+    if (i + 1 != pLength) {
+      program += " or ";
+    }
+  }
+
+  for (let i = pLength + 1; i < req.body.length; i++) {
+    courses[i - (pLength + 1)] = req.body[i]["tablename"];
   }
 
   for (let i = 0; i < courses.length; i++) {
@@ -459,15 +494,31 @@ app.post("/courseSubmission", (req, res) => {
         tempGA = tempGA.replace("undefined", "");
 
         if (j == rows.length - 1) {
-          db.any("select program_name" + tempGA + " from " + courses[i] + ";")
+          console.log(
+            "select program_name" +
+              tempGA +
+              " from " +
+              courses[i] +
+              program +
+              ";"
+          );
+          db.any(
+            "select program_name" +
+              tempGA +
+              " from " +
+              courses[i] +
+              program +
+              ";"
+          )
             .then((columns) => {
               z[courses[i]] = columns;
             })
             .then(() => {
-              if(courses.every((r) => Object.keys(z).includes(r))){
+              if (courses.every((r) => Object.keys(z).includes(r))) {
                 let unique = [...new Set(allGA)];
                 z["GAS"] = unique;
                 z["Courses"] = courses;
+                console.log(z);
                 res.json(z);
               }
             });

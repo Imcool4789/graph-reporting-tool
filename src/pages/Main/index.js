@@ -45,6 +45,7 @@ class Main extends React.Component {
         .then((response) => {
           const getResponse = async () => {
             const obj = await response.json();
+            console.log(obj["timestamp"]);
             if (obj["Admin"].length > 0) {
               this.setState({
                 admin: true,

@@ -6,6 +6,7 @@ import {
   NavMenu,
   NavItem,
   NavLinks,
+  LogOff
 } from "./NavBarElements";
 class NavBar extends React.Component {
   constructor(props) {
@@ -18,12 +19,22 @@ class NavBar extends React.Component {
   componentDidMount() {
     this.navLoad();
   }
+  logOff(){
+    document.cookie = "sessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    console.log("Cookie deleted");
+    window.location.href="/";
+  }
   render() {
     return (
         <Nav>
           <NavBarContainer>
             <NavMenu>{this.state.navItems}</NavMenu>
           </NavBarContainer>
+          {this.state.navItems.length > 0 &&
+        <LogOff onClick={this.logOff.bind(this)}>
+         Sign out
+        </LogOff>
+      }
         </Nav>
     );
   }
