@@ -494,6 +494,14 @@ app.post("/courseSubmission", (req, res) => {
         tempGA = tempGA.replace("undefined", "");
 
         if (j == rows.length - 1) {
+          console.log(
+            "select program_name" +
+              tempGA +
+              " from " +
+              courses[i] +
+              program +
+              ";"
+          );
           db.any(
             "select program_name" +
               tempGA +
