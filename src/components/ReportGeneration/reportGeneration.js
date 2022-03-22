@@ -283,6 +283,12 @@ export default class ReportGeneration extends React.Component {
   }
   parseSelect(flag) {
     let val = [];
+    let programs = document.querySelectorAll('input[type="checkbox"]:checked');
+    programs.forEach((e) => {
+      val.push({ program: e.value });
+    });
+
+    console.log(val);
     val.push({
       GA: document.querySelector('input[name="GARad"]:checked').value,
     });
@@ -507,8 +513,8 @@ export default class ReportGeneration extends React.Component {
   addImage(c, x, y) {
     this.state.pdf.addImage(c.toBase64Image(), "PNG", x, y, 180.2, 102.7);
   }
-  removeCharts(){
-    document.querySelectorAll("canvas").forEach(e => e.remove());;
+  removeCharts() {
+    document.querySelectorAll("canvas").forEach((e) => e.remove());
   }
   render() {
     return (

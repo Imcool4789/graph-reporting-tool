@@ -29,7 +29,6 @@ app.get("/test", (req, res) => {
 app.post("/queryGA", (req, res) => {
   //FOR JOHN TODO
   console.log(req.body["programs"]);
-  
   var x =
     "select table_name from information_schema.columns where column_name ~" +
     "'_" +
@@ -184,6 +183,11 @@ app.post("/departmentSubmission", (req, res) => {
     ).then(() => {
       for (let i = 0; i < temp1.length; i++) {
         db.any(
+          "Insert into secret(email) " +
+            temp1[i] +
+            " on conflict (email) do nothing;"
+        );
+        db.any(
           "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
             "'" +
             temp1[i] +
@@ -256,6 +260,11 @@ app.post("/adminDepartmentSubmission", (req, res) => {
   }
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
+      db.any(
+        "Insert into secret(email) " +
+          temp1[i] +
+          " on conflict (email) do nothing;"
+      );
       db.any(
         "INSERT INTO departments(email, dep_name) VALUES (" +
           "'" +
@@ -362,7 +371,7 @@ app.post("/courseData", (req, res) => {
       }
       let tname = req.body["tName"];
       console.log(tname);
-      let courseName = "_" + req.body["course"]+"_";
+      let courseName = "_" + req.body["course"] + "_";
       console.log(courseName);
       let message = req.body["message"];
       console.log(message);
@@ -433,15 +442,39 @@ app.post("/courseData", (req, res) => {
 });
 
 app.post("/courseSubmission", (req, res) => {
+  var pLength = 0;
+  var cLength = 0;
+  var program = "";
   let x = {};
   let z = {};
   let allGA = [];
   var tempGA;
-  var GA = req.body[0]["GA"];
+  var GA;
   var iter = 0;
   let courses = [];
-  for (let i = 1; i < req.body.length; i++) {
-    courses[i - 1] = req.body[i]["tablename"];
+
+  for (let i = 0; i < req.body.length; i++) {
+    if (req.body[i].hasOwnProperty("program")) {
+      pLength++;
+    } else if (req.body[i].hasOwnProperty("tablename")) {
+      cLength++;
+    } else {
+      GA = req.body[i]["GA"];
+    }
+  }
+
+  for (let i = 0; i < pLength; i++) {
+    if (i == 0) {
+      program += " where ";
+    }
+    program += "program_name='" + req.body[i]["program"] + "'";
+    if (i + 1 != pLength) {
+      program += " or ";
+    }
+  }
+
+  for (let i = pLength + 1; i < req.body.length; i++) {
+    courses[i - (pLength + 1)] = req.body[i]["tablename"];
   }
 
   for (let i = 0; i < courses.length; i++) {
@@ -460,7 +493,22 @@ app.post("/courseSubmission", (req, res) => {
         tempGA = tempGA.replace("undefined", "");
 
         if (j == rows.length - 1) {
-          db.any("select program_name" + tempGA + " from " + courses[i] + ";")
+          console.log(
+            "select program_name" +
+              tempGA +
+              " from " +
+              courses[i] +
+              program +
+              ";"
+          );
+          db.any(
+            "select program_name" +
+              tempGA +
+              " from " +
+              courses[i] +
+              program +
+              ";"
+          )
             .then((columns) => {
               z[courses[i]] = columns;
             })
@@ -469,6 +517,7 @@ app.post("/courseSubmission", (req, res) => {
                 let unique = [...new Set(allGA)];
                 z["GAS"] = unique;
                 z["Courses"] = courses;
+                console.log(z);
                 res.json(z);
               }
             });
