@@ -1,12 +1,12 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import alert from 'alert'
+import alert from "alert";
 
 class LoginComponent extends React.Component {
   /**
    * This function will be used to register all users when a spreadsheet is uploaded by the admin/faculty
-   * @param {*} event 
+   * @param {*} event
    */
   register = (event) => {
     event.preventDefault();
@@ -51,24 +51,12 @@ class LoginComponent extends React.Component {
     )
       .then((response) => {
         console.log(response.status);
-        if(response.status == 403){
-          alert('Incorrect Email or Password!');
+        if (response.status === 403) {
+          alert("Incorrect Email or Password!");
         }
-        response.json()})
-      .then((data) => {
-        console.log("Success:", data);
-        if (data["Admin"].length > 0) {
-          document.getElementById("result").innerHTML += "ROLE: Admin </br>";
-        }
-        if (data["Instructor"].length > 0) {
-          document.getElementById("result").innerHTML +=
-            "ROLE: " + data["Instructor"][0].row+"</br>";
-        }
-        if (data["Department Head"].length > 0) {
-          document.getElementById("result").innerHTML +=
-            "ROLE: " + data["Department Head"][0].dep_name+"</br>";
-        }
-        window.location.reload(false);
+      })
+      .then(() => {
+        window.location.reload(true);
       })
       .catch((error) => {
         console.error("Error:", error);

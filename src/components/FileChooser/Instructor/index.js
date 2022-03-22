@@ -6,6 +6,7 @@ import Bins from "../../../util/DataObjects/Bins";
 import HelperFunctions from "../../../util/HelperFunctions";
 import html2canvas from "html2canvas";
 import pdfConverter from "jspdf";
+import alert from "alert";
 
 export default class InstructorFileChooser extends React.Component {
   constructor(props) {
@@ -21,8 +22,10 @@ export default class InstructorFileChooser extends React.Component {
     for (let i = 0; i < wb.SheetNames.length; i++) {
       var rowObj = XLSX.utils.sheet_to_row_object_array(wb.Sheets["Sheet1"]);
       this.formatArray(rowObj);
+      console.log(rowObj);
       var rowString = JSON.stringify(rowObj);
-      data[i] = rowString;
+      console.log(rowString);
+      data[i] = rowObj;
     }
     this.setState({ excelData: data });
     this.buttonLogic();
@@ -51,7 +54,7 @@ export default class InstructorFileChooser extends React.Component {
     this.buttonLogic();
   }
   buttonLogic() {
-    if (this.state.excelData[0]!==undefined) {
+    if (this.state.excelData[0] !== undefined) {
       let d = document.getElementById("error");
       if (this.checked) {
         this.setState({ disabled: false });
@@ -72,7 +75,7 @@ export default class InstructorFileChooser extends React.Component {
           arr[i]["student_id"] = arr[i][key];
           delete arr[i][key];
         } else if (key.toLowerCase().includes("ga")) {
-          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_");
+          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_").replace("ga","_");
           arr[i][newKey] = arr[i][key];
           delete arr[i][key];
         }
@@ -99,6 +102,10 @@ export default class InstructorFileChooser extends React.Component {
     }
   }
   grabData() {
+    let bod = this.state.excelData;
+    bod["message"] = document.getElementById("Message").value;
+    bod["course"] = this.props.course;
+    bod["tName"] = this.props.table;
     fetch(
       process.env.NODE_ENV === "production"
         ? "https://graphing-report-tool.herokuapp.com/courseData"
@@ -108,14 +115,19 @@ export default class InstructorFileChooser extends React.Component {
         headers: {
           "Content-Type": "application/json",
         },
-        body: this.state.excelData[0],
+        body: JSON.stringify(bod),
       }
     )
-      .then((response) =>
-        response.json().then((data) => {
-          this.populateChart(data);
-        })
-      )
+      .then((response) => {
+        if (response.status === 403) {
+          console.log("error");
+          alert("ERROR");
+        } else {
+          response.json().then((data) => {
+            this.populateChart(data);
+          });
+        }
+      })
       .catch((error) => {
         console.error("Error:", error);
       });
@@ -224,9 +236,9 @@ export default class InstructorFileChooser extends React.Component {
     }
     return dataBins;
   }
-  convertToPdf(){
-    let chart=window.document.getElementById("myChart");
-    html2canvas(chart).then(canvas=>{
+  convertToPdf() {
+    let chart = window.document.getElementById("myChart");
+    html2canvas(chart).then((canvas) => {
       const img = canvas.toDataURL("image/png");
       const pdf = new pdfConverter("l", "pt");
       pdf.addImage(
@@ -241,69 +253,65 @@ export default class InstructorFileChooser extends React.Component {
     });
   }
 
-  SendMessage(){
-    var x = document.getElementById("Message").value;
-    let obj = {};
-    let c = '[' + JSON.stringify(obj) + ']';
-    fetch(
-      process.env.NODE_ENV === "production"
-      ? "https://graphing-report-tool.herokuapp.com/sendMessage"
-      : "http://localhost:5000/sendMessage",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: x,
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        data.forEach(e=>document.getElementById("coursesWithGa").innerHTML+=e["table_name"]+"</br>");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
-
   setCheck() {
     this.checked = !this.checked;
     this.buttonLogic();
   }
   getState() {
-    let r=window.confirm('Are you sure you wish to upload this spreadsheet?')
-    if (r){
-    this.grabData();
-    this.SendMessage();
+    let r = window.confirm("Are you sure you wish to upload this spreadsheet?");
+    if (r) {
+      this.grabData();
     }
   }
   render() {
     return (
-      
       <div>
-        <input type="file" onChange={this.loadFileXLSX.bind(this)} style={{margin : '10px'}}/>
+        <div>Please submit the class' graduate attributes spreadsheet:</div>
+        <input
+          type="file"
+          onChange={this.loadFileXLSX.bind(this)}
+          style={{ margin: "10px" }}
+        />
         <br />
-        <div style={{margin : '10px'}}>Add a Message: </div>
-        <textarea id="Message" name="Messahe" rows="8" cols="70" style={{margin : '10px'}}/>
+        <div style={{ margin: "10px" }}>Add a Message: </div>
+        <textarea
+          id="Message"
+          name="Message"
+          rows="8"
+          cols="70"
+          style={{ margin: "10px" }}
+        />
         <br />
         <div>
-          <input type="checkbox" id="agree" onChange={this.setCheck.bind(this)} style={{margin : '10px'}} />
+          <input
+            type="checkbox"
+            id="agree"
+            onChange={this.setCheck.bind(this)}
+            style={{ margin: "10px" }}
+          />
           <label htmlFor="agree">
-            {" "}
-             I acknowledge that any previous existing data will be{" "}
+            I acknowledge that any previous existing data will be {}
             <b>removed and replaced</b> with the new uploaded data.
           </label>
         </div>
         <br />
-        <button disabled={this.state.disabled} onClick={() => this.getState()} style={{margin : '10px'}}>
+        <button
+          disabled={this.state.disabled}
+          onClick={() => this.getState()}
+          style={{ margin: "10px" }}
+        >
           Upload Graduate Attributes
         </button>
         <div id="error"></div>
         <div id="buttonplaceholder"></div>
         <canvas id="myChart" width="400" height="400"></canvas>
         <div>
-          <button onClick={(e) => this.convertToPdf(e)} style={{margin : '10px'}}>Export 2 PDF</button>
+          <button
+            onClick={(e) => this.convertToPdf(e)}
+            style={{ margin: "10px" }}
+          >
+            Export 2 PDF
+          </button>
         </div>
       </div>
     );

@@ -28,4 +28,3 @@ Graph generation -> make sure to populate based off engineering program
 Admin UI
 course -> mapping GA's submission
 department head submission
-all logic of department included for Admin UI
