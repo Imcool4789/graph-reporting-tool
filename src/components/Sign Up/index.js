@@ -30,7 +30,8 @@ class SignupComponent extends React.Component {
   render() {
     return (
       <>
-        <div>REGISTER: PERSON</div>
+      <Card className="text-center">
+        <div>Please register using your email!</div>
         <Form onSubmit={this.register}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -44,6 +45,7 @@ class SignupComponent extends React.Component {
             Submit
           </Button>
         </Form>
+        </Card>
       </>
     );
   }

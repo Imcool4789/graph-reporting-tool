@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <>
       <NavBar></NavBar>
-      <div style={{ padding: 25 + "px" }}>
+      <div style={{ padding: 25 + "px"}}>
         <LoginComponent></LoginComponent>
       </div>
     </>
