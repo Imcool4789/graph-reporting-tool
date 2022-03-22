@@ -29,7 +29,6 @@ app.get("/test", (req, res) => {
 app.post("/queryGA", (req, res) => {
   //FOR JOHN TODO
   console.log(req.body["programs"]);
-
   var x =
     "select table_name from information_schema.columns where column_name ~" +
     "'_" +
