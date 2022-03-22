@@ -11,7 +11,7 @@ router.post("/register", (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   pass = bcrypt.hashSync(body.password, salt);
   db.any(
-    "INSERT INTO secret(email,hash) values ('" +
+    "INSERT INTO secret(email, hash) values ('" +
       body.email +
       "','" +
       pass +
@@ -70,32 +70,31 @@ router.post("/access", (req, res) => {
             "select 1 from admins,secret where uid='" +
               body.sessionID +
               "'and admins.email=secret.email;"
-          )
-            .then((rows) => {
-              roles["Admin"] = rows;
+          ).then((rows) => {
+            roles["Admin"] = rows;
+            db.any(
+              "select email from secret where uid='" + body.sessionID + "';"
+            ).then((rows) => {
+              subm = rows[0]["email"];
+              subm = subm.replace(".", "");
+              subm = subm.replace("@", "");
+              roles["table"] = subm;
               db.any(
-                "select email from secret where uid='" + body.sessionID + "';"
-              ).then((rows) => {
-                subm = rows[0]["email"];
-                subm = subm.replace(".", "");
-                subm = subm.replace("@", "");
-                roles["table"]=subm;
-                db.any(
-                  "create table if not exists " +
-                    subm +
-                    " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
-                ).then(() => {
-                  db.any("select coursename,timestamp from " + subm + ";").then(
-                    (rows) => {
-                      roles["timestamp"] = rows;
-                    }
-                  ).then(() => {
+                "create table if not exists " +
+                  subm +
+                  " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
+              ).then(() => {
+                db.any("select coursename,timestamp from " + subm + ";")
+                  .then((rows) => {
+                    roles["timestamp"] = rows;
+                  })
+                  .then(() => {
                     res.json(roles);
                   });
-                })
               });
-            })
-            
+            });
+          });
+
         });
       });
     });
