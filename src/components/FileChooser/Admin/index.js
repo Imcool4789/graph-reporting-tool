@@ -323,7 +323,7 @@ export default class AdminFileChooser extends React.Component {
   }
   render() {
     return (
-      <div>
+      <div style={{backgroundColor:"white;"}}>
         <br />
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
         <br />

@@ -35,19 +35,20 @@ class Instructor extends React.Component {
   }
   render() {
     return (
-      <div>
+      <>
         <NavBar></NavBar>
+        <div style={{backgroundColor:"white"}}>
         <Tabs>
           {this.state.instructorData.map((x) => (
-            <Tab eventKey={x} title={x}>
+            <Tab eventKey={x} title={x.replaceAll("_"," ").toUpperCase()}>
               <CenterWrapper>
-                Enter the correct information for
-                {x}
+                Enter the correct information for&nbsp;
+                {x.replaceAll("_"," ").toUpperCase()}
                 <InstructorFileChooser course={x} table={this.props.table}></InstructorFileChooser>
               </CenterWrapper>
             </Tab>
           ))}
-          <Tab eventKey="submissions" title="View Submissions">
+          <Tab style={{backgroundColor:"white;"}} eventKey="submissions" title="View Submissions">
             <CenterWrapper>
               <InstructorSubmissions
                 submissionData={this.props.timestampData}
@@ -55,7 +56,8 @@ class Instructor extends React.Component {
             </CenterWrapper>
           </Tab>
         </Tabs>
-      </div>
+        </div>
+      </>
     );
   }
 }

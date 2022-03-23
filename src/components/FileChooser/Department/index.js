@@ -126,7 +126,7 @@ export default class DepartmentInstructorSubmission extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{backgroundColor:"white"}}>
         <label htmlFor="avatar">Instructor Submission: </label>
         <input type="file" id="1" onChange={this.loadFileXLSX.bind(this)} />
         <br />

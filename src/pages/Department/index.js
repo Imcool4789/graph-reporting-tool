@@ -7,8 +7,9 @@ import DepartmentInstructorSubmission from "../../components/FileChooser/Departm
 import ReportGeneration from "../../components/ReportGeneration/reportGeneration";
 const Department = () => {
   return (
-    <div>
+    <>
       <NavBar></NavBar>
+      <div class="reportGen" style={{backgroundColor:"white",height:"100%"}}>
       <Tabs defaultActiveKey="first">
         <Tab eventKey="first" title="Instructor Submission">
           <CenterWrapper>
@@ -25,7 +26,8 @@ const Department = () => {
           <CenterWrapper></CenterWrapper>
         </Tab>
       </Tabs>
-    </div>
+      </div>
+    </>
   );
 };
 

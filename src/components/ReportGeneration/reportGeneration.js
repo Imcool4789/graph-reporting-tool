@@ -1,4 +1,5 @@
 import React from "react";
+import './reportGeneration.css';
 import * as Chart from "chart.js";
 import ProgramGAMapping from "../../util/DataObjects/ProgramGAMapping";
 import HelperFunctions from "../../util/HelperFunctions";
@@ -507,7 +508,7 @@ export default class ReportGeneration extends React.Component {
     if (flag) {
       this.addImage(c, x, y);
     } else {
-      document.getElementsByTagName("body")[0].appendChild(ctx);
+      document.getElementsByClassName("reportGen")[0].appendChild(ctx);
     }
   }
   addImage(c, x, y) {
