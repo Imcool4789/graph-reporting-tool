@@ -17,14 +17,14 @@ export default class InstructorSubmissions extends React.Component {
     return (
       <div>
         <style>{`table{border:1px solid black;}`}</style>
-        <table>
+        <table class="table">
           <tr>
-            <th>Course</th>
-            <th>Date Submitted</th>
+            <th scope="row">Course</th>
+            <th scope="row">Date Submitted</th>
           </tr>
           {this.props.submissionData.map((data) => (
             <tr>
-              <td>{data["coursename"]}</td>
+              <td>{data["coursename"].replaceAll("_"," ").toUpperCase()}</td>
               <td>
               {data["timestamp"] == null
                 ? "Not submitted"

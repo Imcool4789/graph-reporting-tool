@@ -265,14 +265,14 @@ export default class InstructorFileChooser extends React.Component {
   }
   render() {
     return (
-      <div>
-        <div>Please submit the class' graduate attributes spreadsheet:</div>
+      <div class="border border-light"style={{backgroundColor:"white",height:"100%"}}>
+        <div class="container-sm border border-light border-5 rounded">Please submit the class' graduate attributes spreadsheet:
         <input
           type="file"
           onChange={this.loadFileXLSX.bind(this)}
           style={{ margin: "10px" }}
         />
-        <br />
+        </div>
         <div style={{ margin: "10px" }}>Add a Message: </div>
         <textarea
           id="Message"
@@ -282,17 +282,17 @@ export default class InstructorFileChooser extends React.Component {
           style={{ margin: "10px" }}
         />
         <br />
-        <div>
+        <div class="container">
           <input
             type="checkbox"
             id="agree"
             onChange={this.setCheck.bind(this)}
-            style={{ margin: "10px" }}
+            style={{marginTop: "10px",float: "left"}}
           />
-          <label htmlFor="agree">
+          <div htmlFor="agree" style={{marginLeft: "25px"}}>
             I acknowledge that any previous existing data will be {}
             <b>removed and replaced</b> with the new uploaded data.
-          </label>
+          </div>
         </div>
         <br />
         <button
@@ -304,7 +304,7 @@ export default class InstructorFileChooser extends React.Component {
         </button>
         <div id="error"></div>
         <div id="buttonplaceholder"></div>
-        <canvas id="myChart" width="400" height="400"></canvas>
+        <canvas id="myChart"></canvas>
         <div>
           <button
             onClick={(e) => this.convertToPdf(e)}
