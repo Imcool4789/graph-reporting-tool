@@ -11,14 +11,20 @@ const Department = () => {
       <NavBar></NavBar>
       <div class="reportGen" style={{backgroundColor:"white",height:"100%"}}>
       <Tabs defaultActiveKey="first">
-        <Tab eventKey="first" title="Instructor Submission">
-          <CenterWrapper>
+        <Tab eventKey="first" style={{backgroundColor:"#0d6efd"}} title="Instructor Submission">
+          <CenterWrapper style={{backgroundColor:"white"}}>
+            <div class="text-center" style={{fontSize:"150%"}}><b><u>
             Enter the required information to populate course instructors.
+            </u>
+            </b>
+            </div>
+            <div class="container text-center border border-01">
             <DepartmentInstructorSubmission></DepartmentInstructorSubmission>
+            </div>
           </CenterWrapper>
         </Tab>
-        <Tab eventKey="second" title="Report Generation">
-          <CenterWrapper>
+        <Tab eventKey="second" title="Report Generation" style={{backgroundColor:"#0d6efd"}}>
+          <CenterWrapper >
             <ReportGeneration></ReportGeneration>
           </CenterWrapper>
         </Tab>

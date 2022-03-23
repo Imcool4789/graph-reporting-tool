@@ -41,6 +41,8 @@ export default class ReportGeneration extends React.Component {
     let keys = Object.keys(allCourses);
     let button = document.createElement("button");
     button.id = "selectAll";
+    button.classList.add("btn");
+    button.classList.add("btn-primary")
     button.innerHTML = "Select All";
     button.onclick = function () {
       let checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -51,6 +53,7 @@ export default class ReportGeneration extends React.Component {
       }
     };
     checkBox.append(button);
+    checkBox.append(document.createElement("br"));
     checkBox.append(document.createElement("br"));
     for (let i = 0; i < keys.length; i++) {
       let input = document.createElement("input");
@@ -73,6 +76,8 @@ export default class ReportGeneration extends React.Component {
     let button = document.createElement("button");
     button.id = "GAButton";
     button.innerHTML = "Confirm GA and Programs";
+    button.classList.add("btn");
+    button.classList.add("btn-primary");
     button.onclick = function () {
       let del = document.getElementById("courseSelection");
       while (del.firstChild) {
@@ -119,6 +124,7 @@ export default class ReportGeneration extends React.Component {
           console.error("Error:", error);
         });
     }.bind(this);
+    checkBox.appendChild(document.createElement("br"));
     checkBox.appendChild(button);
   }
   getUniqueVals(arr) {
@@ -519,27 +525,28 @@ export default class ReportGeneration extends React.Component {
   }
   render() {
     return (
-      <div id="parent">
-        <div id="radio">
-          Graduate Attributes (Please select one to start building the report):
+      <div id="parent" style={{width:"90%",backgroundColor:"white",padding:"3em"}}>
+        <div class="text-center" style={{fontSize:"150%"}}>
+          <b><u>Graduate Attributes (Please select one to start building the report):</u></b>
           <br />
+          </div>
+        <div id="radio" style={{padding:"2em"}} class="border border-01">
         </div>
-        <div id="checkBox">
-          Presented Programs (Please select one to start building the report):
+        <div class="text-center" style={{fontSize:"150%"}}>
+          <b><u>   Presented Programs (Please select one to start building the report):</u></b>
           <br />
+          </div>
+        <div id="checkBox" style={{padding:"2em"}} class="border border-01 text-left">
         </div>
         <div id="courseSelection"></div>
-        <button onClick={this.addCourse}>Add Course</button>
-        <br />
-        <button onClick={this.parseSelect.bind(this, true)}>
+        <button class="btn btn-primary" style={{marginRight:"1em"}} onClick={this.addCourse}>Add Course</button>
+        <button class="btn btn-primary" style={{marginRight:"1em"}} onClick={this.parseSelect.bind(this, true)}>
           Build PDF Report
         </button>
-        <br />
-        <button onClick={this.parseSelect.bind(this, false)}>
+        <button class="btn btn-primary" style={{marginRight:"1em"}} onClick={this.parseSelect.bind(this, false)}>
           View Charts in Browser
         </button>
-        <br />
-        <button onClick={this.removeCharts.bind(this)}>
+        <button class="btn btn-primary" onClick={this.removeCharts.bind(this)}>
           Remove all Charts
         </button>
       </div>
