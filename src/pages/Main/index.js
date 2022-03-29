@@ -6,6 +6,8 @@ import Home from "../Home";
 import Instructor from "../Instructor";
 import Administrator from "../Administrator";
 import Department from "../Department";
+import SignupComponent from "../../components/Sign Up";
+import LoginComponent from "../../components/Login";
 
 class Main extends React.Component {
   constructor(props) {
@@ -79,6 +81,7 @@ class Main extends React.Component {
     return (
       <Routes>
         <Route exact path="/" element={<Home/>}></Route>
+        <Route exact path="/signup" element={<SignupComponent/>}></Route>
         {this.state.instructor && 
           <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData} timestampData={this.state.timeStampData} table={this.state.table}/>} ></Route>}
         {this.state.department &&

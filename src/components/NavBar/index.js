@@ -7,28 +7,36 @@ import {
   NavItem,
   NavLinks,
   LogOff
-} from "./NavBarElements";
+} from "./NavBarElements";                 
 class NavBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      navItems: [],
+      navItems: [],                   
     };
     this.navLoad = this.navLoad.bind(this);
   }
   componentDidMount() {
     this.navLoad();
   }
-  logOff(){
+  logOff(){                          
     document.cookie = "sessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     console.log("Cookie deleted");
-    window.location.href="/";
+    window.location.href="/"                                   ;
   }
   render() {
     return (
         <Nav>
           <NavBarContainer>
-            <NavMenu>{this.state.navItems}</NavMenu>
+            
+            <NavMenu>
+            <NavItem>
+                  <NavLinks key="login" to="/">Log In</NavLinks>
+                </NavItem>
+                <NavItem>
+                  <NavLinks key="Signup" to="/signup">Register</NavLinks>
+                </NavItem>
+              {this.state.navItems}</NavMenu>
           </NavBarContainer>
           {this.state.navItems.length > 0 &&
         <LogOff onClick={this.logOff.bind(this)}>
