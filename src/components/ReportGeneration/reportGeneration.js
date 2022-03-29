@@ -447,7 +447,7 @@ export default class ReportGeneration extends React.Component {
     pdf.setFontSize(28);
     pdf.text("Faculty of Engineering", 57.4, 108.5);
     pdf.setFontSize(18);
-    pdf.text("Department of Systems and Computer Engineering", 34.9, 127);
+    pdf.text(this.props.department, 34.9, 127);
     pdf.text("Month Year", 87.3, 140);
     pdf.text("Graduate Attribute Report", 68.8, 177.3);
     pdf.addPage();

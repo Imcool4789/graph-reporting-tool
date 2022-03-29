@@ -64,7 +64,7 @@ class Main extends React.Component {
             if (obj["Department Head"].length > 0) {
               this.setState({
                 department: true,
-                departmentData: obj["Department Head"],
+                departmentData: obj["Department Head"][0].dep_name,
               });
             }
           };
@@ -85,7 +85,7 @@ class Main extends React.Component {
         {this.state.instructor && 
           <Route exact path="/instructor" element={<Instructor instructorData={this.state.instructorData} timestampData={this.state.timeStampData} table={this.state.table}/>} ></Route>}
         {this.state.department &&
-          <Route exact path="/department" element={<Department/>}></Route>}
+          <Route exact path="/department" element={<Department department={this.state.departmentData}/>}></Route>}
         {this.state.admin &&
           <Route exact path="/admin" element={<Administrator/>}></Route>}
       </Routes>

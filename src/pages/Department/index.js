@@ -5,7 +5,11 @@ import Tab from "react-bootstrap/Tab";
 import { CenterWrapper } from "../AllElements";
 import DepartmentInstructorSubmission from "../../components/FileChooser/Department";
 import ReportGeneration from "../../components/ReportGeneration/reportGeneration";
-const Department = () => {
+class Department extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render(){
   return (
     <>
       <NavBar></NavBar>
@@ -25,7 +29,7 @@ const Department = () => {
         </Tab>
         <Tab eventKey="second" title="Report Generation" style={{backgroundColor:"#0d6efd"}}>
           <CenterWrapper >
-            <ReportGeneration></ReportGeneration>
+            <ReportGeneration department={this.props.department}></ReportGeneration>
           </CenterWrapper>
         </Tab>
         <Tab eventKey="third" title="View Submitted Courses">
@@ -35,6 +39,7 @@ const Department = () => {
       </div>
     </>
   );
-};
+  }
+}
 
 export default Department;

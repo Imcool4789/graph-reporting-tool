@@ -16,7 +16,7 @@ const Administrator = () => {
         </Tab>
         <Tab eventKey="second" title="Report Generation" style={{backgroundColor:"#0d6efd"}}>
           <CenterWrapper >
-            <ReportGeneration></ReportGeneration>
+            <ReportGeneration department="admin"></ReportGeneration>
           </CenterWrapper>
         </Tab>
       </Tabs>
