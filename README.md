@@ -2,6 +2,16 @@
 
 ## Heroku Deployment
 
+Sign in Instructions:
+
+Instructor/Department:
+Email: test@gmail.com
+Password: test
+
+Admin:
+Email: admin@gmail.com
+Password: yolo
+
 The working application's progress is available at : https://graphing-report-tool.herokuapp.com/
 
 ## Objectives
