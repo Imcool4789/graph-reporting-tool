@@ -308,7 +308,8 @@ app.post("/adminSubmission", (req, res) => {
   }
 
   for (let i = 0; i < temp.length; i++) {
-    temp[i] = temo[i].replace(".", "_");
+    temp[i] = temp[i].toString().replace(".", "_");
+    console.log(temp[i]);
   }
 
   for (let i = 0; i < term.length; i++) {
@@ -329,34 +330,22 @@ app.post("/adminSubmission", (req, res) => {
   for (let i = 0; i < name.length; i++) {
     var table =
       "CREATE TABLE " +
-      tableName +
+      name[i] +
       " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
     db.any(table).then(() => {
-      for (let i = 1; i < temp.length; i++) {
-        var add = "ALTER TABLE " + name[i] + " ADD _" + temp[i] + " INTEGER;";
-        db.any(add);
+      for (let i = 0; i < name.length; i++) {
+        for (let j = 0; j < temp.length; j++) {
+          var add = "ALTER TABLE " + name[i] + " ADD _" + temp[j] + " INTEGER;";
+          db.any(add);
+        }
       }
     });
   }
-  var year1 = temp[0];
-  var course1 = temp[1];
-  temp.shift();
-  temp.shift();
-  temp.unshift(year1 + "_" + course1);
-  var tableName = "_" + temp[0];
-  var table =
-    "CREATE TABLE " +
-    tableName +
-    " (id SERIAL PRIMARY KEY, program_name VARCHAR);";
-  db.any(table).then(() => {
-    for (let i = 1; i < temp.length; i++) {
-      var add = "ALTER TABLE " + tableName + " ADD _" + temp[i] + " INTEGER;";
-      db.any(add);
-    }
-  });
 });
 
 app.post("/courseData", (req, res) => {
+  let courseName = req.body["course"] + "_";
+  console.log(courseName);
   db.any("SELECT * from student_program_mapping;")
     .then((rows) => {
       let data = req.body["0"];
@@ -371,8 +360,7 @@ app.post("/courseData", (req, res) => {
       }
       let tname = req.body["tName"];
       console.log(tname);
-      let courseName = "_" + req.body["course"] + "_";
-      console.log(courseName);
+
       let message = req.body["message"];
       console.log(message);
       db.any(
