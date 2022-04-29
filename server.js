@@ -183,9 +183,9 @@ app.post("/departmentSubmission", (req, res) => {
     ).then(() => {
       for (let i = 0; i < temp1.length; i++) {
         db.any(
-          "Insert into secret(email) " +
+          "Insert into secret(email) values('" +
             temp1[i] +
-            " on conflict (email) do nothing;"
+            "') on conflict (email) do nothing;"
         );
         db.any(
           "INSERT INTO instructors(email, term, year, course, number, section) VALUES (" +
@@ -257,28 +257,32 @@ app.post("/adminDepartmentSubmission", (req, res) => {
         temp2.push(req.body[i][key]);
       }
     }
-  }
-  db.any("truncate table departments;");
-  db.any(x).then(() => {
-    for (let i = 0; i < temp1.length; i++) {
-      db.any(
-        "Insert into secret(email) " +
-          temp1[i] +
-          " on conflict (email) do nothing;"
-      );
-      db.any(
-        "INSERT INTO departments(email, dep_name) VALUES (" +
-          "'" +
-          temp1[i] +
-          "'" +
-          "," +
-          "'" +
-          temp2[i] +
-          "'" +
-          ");"
-      );
+    if (i == req.body.length - 1) {
+      console.log(temp1);
+      console.log(temp2);
+      db.any("truncate table departments;");
+      db.any(x).then(() => {
+        for (let i = 0; i < temp1.length; i++) {
+          db.any(
+            "Insert into secret(email) values('" +
+              temp1[i] +
+              "') on conflict (email) do nothing;"
+          );
+          db.any(
+            "INSERT INTO departments(email, dep_name) VALUES (" +
+              "'" +
+              temp1[i] +
+              "'" +
+              "," +
+              "'" +
+              temp2[i] +
+              "'" +
+              ");"
+          );
+        }
+      });
     }
-  });
+  }
 });
 
 app.post("/adminSubmission", (req, res) => {
@@ -367,13 +371,14 @@ app.post("/courseData", (req, res) => {
         " set timestamp='" +
         Date.now() +
         "' where coursename='" +
-        courseName;
+        courseName +
+        "_';";
 
-      tUpdate =
-        tUpdate.slice(0, tUpdate.length - 1) +
-        "_';" +
-        tUpdate.slice(tUpdate.length - 1);
-
+      // tUpdate =
+      //   tUpdate.slice(0, tUpdate.length - 1) +
+      //   "_';" +
+      //   tUpdate.slice(tUpdate.length - 1);
+      console.log(tUpdate);
       db.any(tUpdate).catch((error) => {
         console.log(error);
         res.sendStatus(403);
@@ -384,29 +389,29 @@ app.post("/courseData", (req, res) => {
         " set message='" +
         message +
         "' where coursename='" +
-        courseName;
+        courseName +
+        "_';";
 
-      mUpdate =
-        mUpdate.slice(0, mUpdate.length - 1) +
-        "_';" +
-        mUpdate.slice(mUpdate.length - 1);
-
+      // mUpdate =
+      //   mUpdate.slice(0, mUpdate.length - 1) +
+      //   "_';" +
+      //   mUpdate.slice(mUpdate.length - 1);
       console.log(mUpdate);
       db.any(mUpdate).catch((error) => {
         console.log(error);
         res.sendStatus(403);
       });
-      var trun = "truncate table " + courseName;
-      var leng = trun.length;
-      trun = trun.slice(0, leng - 1) + "_;" + trun.slice(leng - 1);
+      var trun = "truncate table " + courseName + "_;";
+      // var leng = trun.length;
+      // trun = trun.slice(0, leng - 1) + "_;" + trun.slice(leng - 1);
       console.log(trun);
       db.any(trun)
         .then(() => {
-          var query = "INSERT INTO " + courseName;
-          query =
-            query.slice(0, query.length - 1) +
-            "_ (" +
-            query.slice(query.length - 1);
+          var query = "INSERT INTO " + courseName + "_ (";
+          // query =
+          //   query.slice(0, query.length - 1) +
+          //   "_ (" +
+          //   query.slice(query.length - 1);
           console.log(query);
           let keys = Object.keys(data[0]);
           for (let i = 0; i < keys.length - 1; i++) {
