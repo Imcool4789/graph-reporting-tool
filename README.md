@@ -16,6 +16,7 @@ Submission samples can be found in sampledate folder.
 
 The working application's progress is available at : https://graphing-report-tool.herokuapp.com/
 
+
 ## Objectives
 
 The objective of this Graph Reporting project is to design and develop a web application that 
