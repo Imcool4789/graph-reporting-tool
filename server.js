@@ -217,7 +217,7 @@ app.post("/departmentSubmission", (req, res) => {
             db.any(
               "create table if not exists " +
                 subTable +
-                " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
+                " (id serial primary key, coursename varchar unique, timestamp varchar, message varchar);"
             );
           })
           .then(() => {
@@ -258,6 +258,7 @@ app.post("/adminDepartmentSubmission", (req, res) => {
       }
     }
   }
+  db.any("truncate table departments;");
   db.any(x).then(() => {
     for (let i = 0; i < temp1.length; i++) {
       db.any(
@@ -344,8 +345,6 @@ app.post("/adminSubmission", (req, res) => {
 });
 
 app.post("/courseData", (req, res) => {
-  let courseName = req.body["course"] + "_";
-  console.log(courseName);
   db.any("SELECT * from student_program_mapping;")
     .then((rows) => {
       let data = req.body["0"];
@@ -359,37 +358,56 @@ app.post("/courseData", (req, res) => {
         }
       }
       let tname = req.body["tName"];
-      console.log(tname);
-
+      let courseName = req.body["course"];
       let message = req.body["message"];
-      console.log(message);
-      db.any(
+
+      tUpdate =
         "update " +
-          tname +
-          " set timestamp='" +
-          Date.now() +
-          "' where coursename='" +
-          courseName +
-          "';"
-      ).catch((error) => {
+        tname +
+        " set timestamp='" +
+        Date.now() +
+        "' where coursename='" +
+        courseName;
+
+      tUpdate =
+        tUpdate.slice(0, tUpdate.length - 1) +
+        "_';" +
+        tUpdate.slice(tUpdate.length - 1);
+
+      db.any(tUpdate).catch((error) => {
         console.log(error);
         res.sendStatus(403);
       });
-      db.any(
+      var mUpdate =
         "update " +
-          tname +
-          " set message='" +
-          message +
-          "' where coursename='" +
-          courseName +
-          "';"
-      ).catch((error) => {
+        tname +
+        " set message='" +
+        message +
+        "' where coursename='" +
+        courseName;
+
+      mUpdate =
+        mUpdate.slice(0, mUpdate.length - 1) +
+        "_';" +
+        mUpdate.slice(mUpdate.length - 1);
+
+      console.log(mUpdate);
+      db.any(mUpdate).catch((error) => {
         console.log(error);
         res.sendStatus(403);
       });
-      db.any("Delete from " + courseName)
+      var trun = "truncate table " + courseName;
+      var leng = trun.length;
+      trun = trun.slice(0, leng - 1) + "_;" + trun.slice(leng - 1);
+      console.log(trun);
+      db.any(trun)
         .then(() => {
-          let query = "INSERT INTO " + courseName + " (";
+          var query = "INSERT INTO " + courseName;
+          query =
+            query.slice(0, query.length - 1) +
+            "_ (" +
+            query.slice(query.length - 1);
+          console.log(query);
           let keys = Object.keys(data[0]);
           for (let i = 0; i < keys.length - 1; i++) {
             query += keys[i] + ",";

@@ -75,7 +75,11 @@ export default class InstructorFileChooser extends React.Component {
           arr[i]["student_id"] = arr[i][key];
           delete arr[i][key];
         } else if (key.toLowerCase().includes("ga")) {
-          let newKey = key.toLowerCase().replace(/\s/g, "").replace(".", "_").replace("ga","_");
+          let newKey = key
+            .toLowerCase()
+            .replace(/\s/g, "")
+            .replace(".", "_")
+            .replace("ga", "_");
           arr[i][newKey] = arr[i][key];
           delete arr[i][key];
         }
@@ -104,7 +108,7 @@ export default class InstructorFileChooser extends React.Component {
   grabData() {
     let bod = this.state.excelData;
     bod["message"] = document.getElementById("Message").value;
-    bod["course"] = this.props.course;
+    bod["course"] = "_" + this.props.course;
     bod["tName"] = this.props.table;
     fetch(
       process.env.NODE_ENV === "production"
@@ -265,13 +269,17 @@ export default class InstructorFileChooser extends React.Component {
   }
   render() {
     return (
-      <div class="border border-light"style={{backgroundColor:"white",height:"100%"}}>
-        <div class="container-sm border border-light border-5 rounded">Please submit the class' graduate attributes spreadsheet:
-        <input
-          type="file"
-          onChange={this.loadFileXLSX.bind(this)}
-          style={{ margin: "10px" }}
-        />
+      <div
+        class="border border-light"
+        style={{ backgroundColor: "white", height: "100%" }}
+      >
+        <div class="container-sm border border-light border-5 rounded">
+          Please submit the class' graduate attributes spreadsheet:
+          <input
+            type="file"
+            onChange={this.loadFileXLSX.bind(this)}
+            style={{ margin: "10px" }}
+          />
         </div>
         <div style={{ margin: "10px" }}>Add a Message: </div>
         <textarea
@@ -287,9 +295,9 @@ export default class InstructorFileChooser extends React.Component {
             type="checkbox"
             id="agree"
             onChange={this.setCheck.bind(this)}
-            style={{marginTop: "10px",float: "left"}}
+            style={{ marginTop: "10px", float: "left" }}
           />
-          <div htmlFor="agree" style={{marginLeft: "25px"}}>
+          <div htmlFor="agree" style={{ marginLeft: "25px" }}>
             I acknowledge that any previous existing data will be {}
             <b>removed and replaced</b> with the new uploaded data.
           </div>

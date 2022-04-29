@@ -82,7 +82,7 @@ router.post("/access", (req, res) => {
               db.any(
                 "create table if not exists " +
                   subm +
-                  " (id serial primary key, coursename varchar, timestamp varchar, message varchar);"
+                  " (id serial primary key, coursename varchar unique, timestamp varchar, message varchar);"
               ).then(() => {
                 db.any("select coursename,timestamp from " + subm + ";")
                   .then((rows) => {
