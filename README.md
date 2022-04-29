@@ -12,6 +12,7 @@ Admin:
 Email: admin@gmail.com
 Password: yolo
 
+Submission samples can be found in sampledate folder. 
 The working application's progress is available at : https://graphing-report-tool.herokuapp.com/
 
 ## Objectives
